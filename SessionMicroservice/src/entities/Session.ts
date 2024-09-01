@@ -3,10 +3,12 @@ import {
     PrimaryGeneratedColumn,
     Column,
     ManyToOne,
-    OneToMany
+    OneToMany,
+    BeforeInsert
   } from 'typeorm';
 import { Vertex } from './Vertex';
 import { Edge } from './Edge';
+import { Security } from '../utils/security';
   
   @Entity()
   export class Session {
@@ -16,7 +18,7 @@ import { Edge } from './Edge';
     @Column({ unique: true })
     visibleId: string;
   
-    @Column()
+    @Column({unique: false})
     sessionName: string;
 
     @Column()
@@ -60,5 +62,10 @@ import { Edge } from './Edge';
   
     @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
     updatedAt: Date;
+
+    @BeforeInsert()
+    setSessionName(){
+      this.sessionName = Security.generateRandomString()
+    }
 
   }

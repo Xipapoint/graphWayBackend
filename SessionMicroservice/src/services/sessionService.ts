@@ -10,12 +10,28 @@ class SessionService implements ISessionServiceImpl{
         this.sessionRepository = sessionRepository
     }
     createSession(): Promise<Session> {
-        throw new Error("Method not implemented.");
+        try {
+            throw new Error("Method not implemented.");
+        } catch (error) {
+            
+        }
     }
     getSessionTypes(): Promise<IGetSessionTypesResponseDTO> {
         throw new Error("Method not implemented.");
     }
     getAlgosByStruct(): Promise<IGetAlgosResponseDTO> {
+        throw new Error("Method not implemented.");
+    }
+    updateSession(): Promise<Session> {
+        throw new Error("Method not implemented.");
+    }
+    deleteSession(): Promise<boolean> {
+        throw new Error("Method not implemented.");
+    }
+    changeNameSession(): Promise<string> {
+        throw new Error("Method not implemented.");
+    }
+    getSessionsByUserId(): Promise<Session[]> {
         throw new Error("Method not implemented.");
     }
 }

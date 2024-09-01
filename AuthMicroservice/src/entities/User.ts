@@ -25,12 +25,6 @@ export class User {
   @Column({ nullable: true })
   avatar: string;
 
-  @Column({default: 0})
-  walletAmount: number;
-
-  @Column({default: undefined})
-  currentWalletId: string;
-
   @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;
 

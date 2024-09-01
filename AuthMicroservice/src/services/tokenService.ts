@@ -32,7 +32,8 @@ class tokenService implements ITokenServiceImpl{
 
         return {
             accessToken,
-            refreshToken
+            refreshToken,
+            id: userId
         };
     }
 
@@ -59,6 +60,10 @@ class tokenService implements ITokenServiceImpl{
 
     public async verifyRefreshToken(token: string): Promise<JwtPayload> {
         return jwt.verify(token, process.env.JWT_REFRESH_SECRET as string) as JwtPayload;
+    }
+
+    async findToken(refreshToken: string) {
+        return await this.tokenRepository.findOneBy({refreshToken})
     }
 }
 
