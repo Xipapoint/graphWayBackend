@@ -9,6 +9,9 @@ import {
 import { Vertex } from './Vertex';
 import { Edge } from './Edge';
 import { Security } from '../utils/security';
+import { SessionTypes } from './SessionTypes';
+import { SessionStructures } from './SessionStructures';
+import { Alghorithm } from './Alghorithm';
   
   @Entity()
   export class Session {
@@ -20,30 +23,12 @@ import { Security } from '../utils/security';
   
     @Column({unique: false})
     sessionName: string;
-
-    @Column()
-    sessionType: string
-
-    @Column()
-    sessionImage: string
-  
-    @Column()
-    structType: string;
-    
-    @Column()
-    structImage: string
-
-    @Column()
-    structDescription: string;
     
     @Column({nullable: true})
-    alghorithm?: string
+    alghorithm?: Alghorithm
 
-    @Column({nullable: true})
-    alghorithmImage?: string
-
-    @Column({nullable: true})
-    alghorithmDescription?: string
+    @Column({ nullable: true, type: 'simple-array' })
+    shortestVertices?: number[];
 
     @OneToMany(() => Vertex, vertex => vertex.vertexId)
     vertices: Vertex[];
@@ -51,11 +36,14 @@ import { Security } from '../utils/security';
     @OneToMany(() => Edge, edge => edge.session)
     edges: Edge[];
   
-    @Column({ nullable: true, type: 'simple-array' })
-    shortestVertices?: number[];
-  
     @Column()
     userId: string
+
+    @Column()
+    sessionType: SessionTypes
+  
+    @Column()
+    structType: SessionStructures;
 
     @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
     createdAt: Date;
