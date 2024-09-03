@@ -16,10 +16,7 @@ import { Alghorithm } from './Alghorithm';
   @Entity()
   export class Session {
     @PrimaryGeneratedColumn('uuid')
-    id: number;
-  
-    @Column({ unique: true })
-    visibleId: string;
+    id: string;
   
     @Column({unique: false})
     sessionName: string;
