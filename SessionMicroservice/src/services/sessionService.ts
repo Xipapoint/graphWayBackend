@@ -7,6 +7,9 @@ import { ICreateSessionRequestDTO } from "../dto/request/CreateSessionRequestDTO
 import { SessionStructures } from "../entities/SessionStructures";
 import { SessionTypes } from "../entities/SessionTypes";
 import { Alghorithm } from '../entities/Alghorithm';
+import { CheckUserExistsRequestMessage } from "../rabbitMQ/types/request/requestTypes";
+import producer from "../rabbitMQ/producer";
+import { CheckUserExistsResponse } from "../rabbitMQ/types/response/responseTypes";
 
 class SessionService implements ISessionServiceImpl{
     private sessionRepository: Repository<Session>
@@ -33,7 +36,16 @@ class SessionService implements ISessionServiceImpl{
             if(!existingSessionStructure) throw new Error("Session structure doesnt exist")
             const existingAlghorithm = await this.sessionAlghorithmRepository.findOne({where: {id: alghorithmId}})
             if(!existingAlghorithm) throw new Error("Session alghorithm doesnt exist")
-            //TODO: Implement rabbitmq logic to check whether the user exists
+            const checkUserExistsRabbitMQMessage: CheckUserExistsRequestMessage = 
+            {
+                serviceType: 'checkUserExists',
+                data:{
+                    id: userId
+                }
+            }
+            const responseRabbitMQ = await producer.publishMessage<CheckUserExistsResponse>(checkUserExistsRabbitMQMessage)
+            const isUserExists = responseRabbitMQ.isUserExists
+            if(!isUserExists) throw new Error("User doesnt exist")
             const session: Session =await this.sessionRepository.create(
             {
                 sessionType: existingSessionType, 
