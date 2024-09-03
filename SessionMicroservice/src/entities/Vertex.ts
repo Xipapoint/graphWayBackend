@@ -19,8 +19,8 @@ export class Vertex {
   @Column({ default: false })
   isShortest: boolean;
 
-  @ManyToOne(() => Session, session => session)
-  session: Session;
+  @ManyToOne(() => Session, session => session, {nullable: true})
+  session?: Session;
 
   @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;

@@ -1,4 +1,6 @@
 export interface ICreateSessionRequestDTO{
-    sessionType: string,
-    structType
+    sessionTypeId: number,
+    sessionStructId: number,
+    alghorithmId: number,
+    userId: string,
 }

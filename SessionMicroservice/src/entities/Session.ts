@@ -30,11 +30,11 @@ import { Alghorithm } from './Alghorithm';
     @Column({ nullable: true, type: 'simple-array' })
     shortestVertices?: number[];
 
-    @OneToMany(() => Vertex, vertex => vertex.vertexId)
-    vertices: Vertex[];
+    @OneToMany( () => Vertex, vertex => vertex.vertexId, {nullable: true})
+    vertices?: Vertex[];
   
-    @OneToMany(() => Edge, edge => edge.session)
-    edges: Edge[];
+    @OneToMany(() => Edge, edge => edge.session, {nullable: true})
+    edges?: Edge[];
   
     @Column()
     userId: string

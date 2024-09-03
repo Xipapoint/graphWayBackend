@@ -30,8 +30,8 @@ export class Edge {
   @Column({ default: false })
   isShortest: boolean;
 
-  @ManyToOne(() => Session, session => session.edges)
-  session: Session;
+  @ManyToOne(() => Session, session => session.edges, {nullable: true})
+  session?: Session;
 
   @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;
