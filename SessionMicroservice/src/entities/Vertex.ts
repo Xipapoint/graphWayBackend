@@ -1,10 +1,10 @@
 
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { Entity, PrimaryColumn, Column, ManyToOne } from "typeorm";
 import { Session } from "./Session";
 
 @Entity()
 export class Vertex {
-  @PrimaryGeneratedColumn()
+  @PrimaryColumn('number')
   vertexId: number;
 
   @Column({nullable: true})

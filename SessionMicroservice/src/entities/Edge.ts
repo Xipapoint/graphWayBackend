@@ -10,9 +10,6 @@ export class Edge {
   left?: number;
 
   @Column({ nullable: true })
-  right?: number;
-
-  @Column({ nullable: true })
   top?: number;
 
   @Column({ nullable: true })

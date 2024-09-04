@@ -1,0 +1,1 @@
+type UPDATE_TYPE = 'update' | 'create' | 'delete'
