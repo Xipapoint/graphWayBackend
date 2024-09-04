@@ -27,7 +27,7 @@ import { Alghorithm } from './Alghorithm';
     @Column({ nullable: true, type: 'simple-array' })
     shortestVertices?: number[];
 
-    @OneToMany( () => Vertex, vertex => vertex.vertexId, {nullable: true})
+    @OneToMany( () => Vertex, vertex => vertex.id, {nullable: true})
     vertices?: Vertex[];
   
     @OneToMany(() => Edge, edge => edge.session, {nullable: true})

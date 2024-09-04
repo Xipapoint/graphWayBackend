@@ -5,7 +5,7 @@ import { Session } from "./Session";
 @Entity()
 export class Vertex {
   @PrimaryColumn('number')
-  vertexId: number;
+  id: number;
 
   @Column({nullable: true})
   xCord?: number;

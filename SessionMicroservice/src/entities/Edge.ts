@@ -4,7 +4,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 @Entity()
 export class Edge {
   @PrimaryGeneratedColumn('uuid')
-  edgeId: number;
+  id: number;
 
   @Column({ nullable: true })
   left?: number;
