@@ -9,7 +9,7 @@ export class SessionStructures{
     sessionStructureName: string;
 
     @Column()
-    sessionStructureImage: string
+    sessionStructureImagePath: string
 
     @Column()
     structDescription: string;

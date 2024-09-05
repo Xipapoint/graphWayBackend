@@ -9,7 +9,7 @@ export class SessionTypes{
     sessionTypeName: string;
 
     @Column()
-    sessionTypeImage: string
+    sessionTypeImagePath: string
 
     @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
     createdAt: Date;

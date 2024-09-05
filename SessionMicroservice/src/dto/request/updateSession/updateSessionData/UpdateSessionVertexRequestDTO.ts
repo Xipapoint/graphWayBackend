@@ -1,4 +1,4 @@
-import { IVertex } from "./interfaces/vertex";
+import { IVertex } from "../interfaces/vertex";
 
 export interface IUpdateOrDeleteSessionVertexRequestDTO {
     id: number

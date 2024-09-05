@@ -1,4 +1,4 @@
-import { IEdge } from "./interfaces/edge";
+import { IEdge } from "../interfaces/edge";
 
 export interface IUpdateOrDeleteSessionEdgeRequestDTO {
     id: number

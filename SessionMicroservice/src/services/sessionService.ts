@@ -15,18 +15,18 @@ import { IGetAlgosResponseDTO } from "../dto/response/session/GetAlgosResponseDT
 import { IGetSessionTypesResponseDTO } from "../dto/response/session/GetSessionTypesResponseDTO";
 import { IUpdateSessionRequestDTO } from "../dto/request/updateSession/UpdateSessionRequestDTO";
 import { Vertex } from "../entities/Vertex";
-import { IVertex } from "../dto/request/updateSession/interfaces/vertex";
 import { Edge } from "../entities/Edge";
-import { IEdge } from "../dto/request/updateSession/interfaces/edge";
 import { ISessionStructRepositoryImpl } from "../repository/impl/sessionStructRepositoryImpl";
 import { ISessionTypeRepositoryImpl } from "../repository/impl/sessionTypeRepositoryImpl";
 import { ISessionAlghoRepositoryImpl } from '../repository/impl/sessionAlghoRepositoryImpl';
-import { IUpdateOrDeleteSessionVertexRequestDTO } from "../dto/request/updateSession/UpdateSessionVertexRequestDTO";
-import { IUpdateOrDeleteSessionEdgeRequestDTO } from "../dto/request/updateSession/UpdateSessionEdgeRequestDTO";
+import { IUpdateOrDeleteSessionVertexRequestDTO } from "../dto/request/updateSession/updateSessionData/UpdateSessionVertexRequestDTO";
+import { IUpdateOrDeleteSessionEdgeRequestDTO } from "../dto/request/updateSession/updateSessionData/UpdateSessionEdgeRequestDTO";
 import { AppDataSource } from "../dataSource";
 import sessionStructRepository from "../repository/sessionStructRepository";
 import sessionTypeRepository from "../repository/sessionTypeRepository";
 import sessionAlghoRepository from "../repository/sessionAlghoRepository";
+import * as fs from 'fs'
+import * as path from 'path'
 
 class SessionService implements ISessionServiceImpl{
     private sessionRepository: Repository<Session>
@@ -148,10 +148,10 @@ class SessionService implements ISessionServiceImpl{
     }    
     async getSessionTypes(): Promise<IGetSessionTypesResponseDTO[]> {
         try {
-            const sessionTypes = await this.sessionTypeRepository.findAll({select: ['sessionTypeName', 'sessionTypeImage']})
+            const sessionTypes = await this.sessionTypeRepository.findAll({select: ['sessionTypeName', 'sessionTypeImagePath']})
             const response: Promise<IGetSessionTypesResponseDTO>[] = sessionTypes.map(async sessionType => ({
                 sessionTypeName: sessionType.sessionTypeName,
-                sessionImage: sessionType.sessionTypeImage
+                sessionImage: sessionType.sessionTypeImagePath
             }))
             return await Promise.all(response)
         } catch (error) {
@@ -162,12 +162,12 @@ class SessionService implements ISessionServiceImpl{
     async getAlgosByStruct(): Promise<IGetAlgosResponseDTO[]> {
         try {
             const alghorithms = await this.sessionAlghorithmRepository.findAll(
-                {select: ['alghorithmName', 'alghorithmImage', 'alghorithmDescription']}
+                {select: ['alghorithmName', 'alghorithmImagePath', 'alghorithmDescription']}
             )
             const response: Promise<IGetAlgosResponseDTO>[] = alghorithms.map(async alghorithm => ({
                 alghorithm: alghorithm.alghorithmName,
                 alghorithmDescription: alghorithm.alghorithmDescription,
-                alghorithmImage: alghorithm.alghorithmImage
+                alghorithmImage: alghorithm.alghorithmImagePath
             }))
             return await Promise.all(response)
         } catch (error) {
@@ -178,12 +178,12 @@ class SessionService implements ISessionServiceImpl{
     async getSessionStructures(): Promise<IGetSessionStructuresResponseDTO[]> {
         try {
             const structures = await this.sessionStructRepository.findAll(
-                {select: ['sessionStructureName', 'structDescription', 'sessionStructureImage']}
+                {select: ['sessionStructureName', 'structDescription', 'sessionStructureImagePath']}
             )
             const response: Promise<IGetSessionStructuresResponseDTO>[] = structures.map(async structure => ({
                 sessionStructureName: structure.sessionStructureName,
                 structDescription: structure.structDescription,
-                sessionStructureImage: structure.sessionStructureImage
+                sessionStructureImage: structure.sessionStructureImagePath
             }))
             return await Promise.all(response)
         } catch (error) {
@@ -196,6 +196,7 @@ class SessionService implements ISessionServiceImpl{
         const sessionId = sessionUpdate.sessionId
         const session = await this.sessionRepository.findOne({where: {id: sessionId}})
         if(!session) throw new NotFoundError("Session doesnt exist")
+        const imageBase64 = sessionUpdate.imageBase64
         const vertices = sessionUpdate.vertices
         const edges = sessionUpdate.edges
         if(vertices){
@@ -204,7 +205,17 @@ class SessionService implements ISessionServiceImpl{
         if(edges){
             await this. updateEdges(edges, sessionId)
         }
+        let imagePath: string | undefined;
 
+        if (imageBase64) {
+          const base64Data = imageBase64.replace(/^data:image\/png;base64,/, '');
+          const filename = `${Date.now()}_${sessionId}.png`;
+          const filePath = path.join(__dirname, 'uploads', filename); 
+    
+          fs.writeFileSync(filePath, base64Data, 'base64');
+          imagePath = filePath;
+        }
+        session.sessionImagePath = imagePath
         await this.sessionRepository.save(session)
         return session
     }

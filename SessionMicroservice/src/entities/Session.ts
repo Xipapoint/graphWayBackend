@@ -20,6 +20,9 @@ import { Alghorithm } from './Alghorithm';
   
     @Column({unique: false})
     sessionName: string;
+
+    @Column({nullable: true})
+    sessionImagePath?: string;
     
     @Column({nullable: true})
     alghorithm?: Alghorithm

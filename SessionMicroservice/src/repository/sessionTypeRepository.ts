@@ -3,6 +3,7 @@ import { SessionTypes } from "../entities/SessionTypes";
 import NotFoundError from "../error/4__Error/NotFoundError.error";
 import { AppDataSource } from "../dataSource";
 import { ISessionTypeRepositoryImpl } from "./impl/sessionTypeRepositoryImpl";
+import { sessionRouter } from '../router/sessionRouter';
 
 class SessionTypeRepository implements ISessionTypeRepositoryImpl{
     private sessionTypeRepository: Repository<SessionTypes>
@@ -22,6 +23,15 @@ class SessionTypeRepository implements ISessionTypeRepositoryImpl{
     public async findAll(options?: FindManyOptions<SessionTypes>): Promise<SessionTypes[]> {
         const alghorithms = await this.sessionTypeRepository.find(options)
         return alghorithms
+    }
+
+    public async setImage(imagePath: string, sessionTypeId: number): Promise<void>{
+        try{
+            const sessionType = await this.findSessionType(sessionTypeId)
+            sessionType.sessionTypeImagePath = imagePath
+        } catch(error){
+            throw error
+        }
     }
 }
 

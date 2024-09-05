@@ -9,7 +9,7 @@ export class Alghorithm{
     alghorithmName: string
 
     @Column()
-    alghorithmImage: string
+    alghorithmImagePath: string
 
     @Column()
     alghorithmDescription: string
