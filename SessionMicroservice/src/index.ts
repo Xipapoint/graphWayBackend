@@ -6,7 +6,9 @@ import dotenv from "dotenv";
 import { AppDataSource } from './dataSource';
 const allowedOrigins = ['http://localhost:5173'];
 import swaggerUi from 'swagger-ui-express'
-import { swaggerSpec } from './utils/swagger';
+import { swaggerSpec } from './config/swagger';
+import { router } from './router';
+import errorMiddleware from './middleware/errorMiddleware';
 
 app.use(helmet());
 const corsOptions = {
@@ -29,8 +31,8 @@ app.use(
   })
 );
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-// app.use('/api', router)
-
+app.use('/api', router)
+app.use(errorMiddleware)
 const PORT = process.env.PORT as number | undefined
 
 const start = async () => {
