@@ -13,7 +13,7 @@ import { SessionTypes } from './SessionTypes';
 import { SessionStructures } from './SessionStructures';
 import { Alghorithm } from './Alghorithm';
   
-  @Entity()
+  @Entity('sessions')
   export class Session {
     @PrimaryGeneratedColumn('uuid')
     id: string;

@@ -5,6 +5,8 @@ const app: Application = express();
 import dotenv from "dotenv";
 import { AppDataSource } from './dataSource';
 const allowedOrigins = ['http://localhost:5173'];
+import swaggerUi from 'swagger-ui-express'
+import { swaggerSpec } from './utils/swagger';
 
 app.use(helmet());
 const corsOptions = {
@@ -26,6 +28,7 @@ app.use(
     extended: true,
   })
 );
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // app.use('/api', router)
 
 const PORT = process.env.PORT as number | undefined

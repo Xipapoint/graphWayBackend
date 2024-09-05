@@ -1,5 +1,5 @@
 import { DeepPartial, FindOptionsWhere, Not, ObjectLiteral, Repository } from "typeorm";
-import { Session } from "../entities/Session";
+import { Session } from '../entities/Session';
 import { ISessionServiceImpl } from "./impl/sessionServiceImpl";
 import { ICreateSessionRequestDTO } from "../dto/request/CreateSessionRequestDTO";
 import { SessionStructures } from "../entities/SessionStructures";
@@ -23,6 +23,10 @@ import { ISessionTypeRepositoryImpl } from "../repository/impl/sessionTypeReposi
 import { ISessionAlghoRepositoryImpl } from '../repository/impl/sessionAlghoRepositoryImpl';
 import { IUpdateOrDeleteSessionVertexRequestDTO } from "../dto/request/updateSession/UpdateSessionVertexRequestDTO";
 import { IUpdateOrDeleteSessionEdgeRequestDTO } from "../dto/request/updateSession/UpdateSessionEdgeRequestDTO";
+import { AppDataSource } from "../dataSource";
+import sessionStructRepository from "../repository/sessionStructRepository";
+import sessionTypeRepository from "../repository/sessionTypeRepository";
+import sessionAlghoRepository from "../repository/sessionAlghoRepository";
 
 class SessionService implements ISessionServiceImpl{
     private sessionRepository: Repository<Session>
@@ -214,3 +218,12 @@ class SessionService implements ISessionServiceImpl{
         throw new Error("Method not implemented.");
     }
 }
+
+export default new SessionService(
+    AppDataSource.getRepository(Session), 
+    sessionStructRepository, 
+    sessionTypeRepository, 
+    sessionAlghoRepository, 
+    AppDataSource.getRepository(Vertex), 
+    AppDataSource.getRepository(Edge)
+)

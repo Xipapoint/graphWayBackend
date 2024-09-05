@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity()
+@Entity('alghorithms')
 export class Alghorithm{
     @PrimaryGeneratedColumn('increment')
     id: number

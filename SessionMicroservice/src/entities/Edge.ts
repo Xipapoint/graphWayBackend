@@ -1,7 +1,7 @@
 import { Session } from "./Session";
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 
-@Entity()
+@Entity('edges')
 export class Edge {
   @PrimaryGeneratedColumn('uuid')
   id: number;

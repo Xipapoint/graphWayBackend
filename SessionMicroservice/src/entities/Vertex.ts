@@ -2,7 +2,7 @@
 import { Entity, PrimaryColumn, Column, ManyToOne } from "typeorm";
 import { Session } from "./Session";
 
-@Entity()
+@Entity('vertices')
 export class Vertex {
   @PrimaryColumn('number')
   id: number;

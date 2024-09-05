@@ -7,5 +7,4 @@ export interface IEdge{
     startVertex: number,
     endVertex: number,
     isShortest: boolean
-    sessionId: string
 }
