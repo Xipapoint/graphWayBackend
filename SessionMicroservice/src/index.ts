@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 import { AppDataSource } from './dataSource';
 const allowedOrigins = ['http://localhost:5173'];
 import swaggerUi from 'swagger-ui-express'
-import { swaggerSpec } from './utils/swagger';
+import { swaggerSpec } from './config/swagger';
 
 app.use(helmet());
 const corsOptions = {
