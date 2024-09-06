@@ -39,7 +39,6 @@ const start = async () => {
   try {
     AppDataSource.initialize();
     app.listen(PORT, () => console.log(`Server started on PORT = ${PORT}`));
-
     
   } catch (e) {
     console.log(e);
