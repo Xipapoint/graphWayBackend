@@ -1,5 +1,5 @@
 import { FindManyOptions } from "typeorm";
-import { Alghorithm } from "../../entities/Alghorithm";
+import { Alghorithm } from "../../../entities/types/Alghorithm";
 
 export interface ISessionAlghoRepositoryImpl{
     findSessionAlghorithm(alghorithmId: number): Promise<Alghorithm>

@@ -1,5 +1,5 @@
 import { FindManyOptions } from "typeorm";
-import { SessionTypes } from "../../entities/SessionTypes";
+import { SessionTypes } from "../../../entities/types/SessionTypes";
 
 export interface ISessionTypeRepositoryImpl{
     findSessionType(sessionTypeId: number): Promise<SessionTypes>

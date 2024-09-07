@@ -1,8 +1,8 @@
 import { FindManyOptions, Repository } from "typeorm";
-import { AppDataSource } from "../dataSource";
-import { Alghorithm } from "../entities/Alghorithm";
-import NotFoundError from "../error/4__Error/NotFoundError.error";
-import { ISessionAlghoRepositoryImpl } from "./impl/sessionAlghoRepositoryImpl";
+import { AppDataSource } from "../../dataSource";
+import { Alghorithm } from "../../entities/types/Alghorithm";
+import NotFoundError from "../../error/4__Error/NotFoundError.error";
+import { ISessionAlghoRepositoryImpl } from "../impl/repos/sessionAlghoRepositoryImpl";
 
 class SessionAlghoRepository implements ISessionAlghoRepositoryImpl{
     private sessionAlghorithmRepository: Repository<Alghorithm>

@@ -1,8 +1,8 @@
 import { FindManyOptions, Repository } from "typeorm";
-import { AppDataSource } from "../dataSource";
-import { SessionStructures } from "../entities/SessionStructures";
-import NotFoundError from "../error/4__Error/NotFoundError.error";
-import { ISessionStructRepositoryImpl } from "./impl/sessionStructRepositoryImpl";
+import { AppDataSource } from "../../dataSource";
+import { SessionStructures } from "../../entities/types/SessionStructures";
+import NotFoundError from "../../error/4__Error/NotFoundError.error";
+import { ISessionStructRepositoryImpl } from "../impl/repos/sessionStructRepositoryImpl";
 
 class SessionStructService implements ISessionStructRepositoryImpl{
     private sessionStructRepository: Repository<SessionStructures>

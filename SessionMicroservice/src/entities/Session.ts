@@ -4,17 +4,18 @@ import {
     Column,
     ManyToOne,
     OneToMany,
-    BeforeInsert
+    BeforeInsert,
+    BaseEntity
   } from 'typeorm';
-import { Vertex } from './Vertex';
-import { Edge } from './Edge';
+import { Vertex } from './structures/Vertex';
+import { Edge } from './structures/Edge';
 import { Security } from '../utils/security';
-import { SessionTypes } from './SessionTypes';
-import { SessionStructures } from './SessionStructures';
-import { Alghorithm } from './Alghorithm';
+import { SessionTypes } from './types/SessionTypes';
+import { SessionStructures } from './types/SessionStructures';
+import { Alghorithm } from './types/Alghorithm';
   
   @Entity('sessions')
-  export class Session {
+  export class Session extends BaseEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
   

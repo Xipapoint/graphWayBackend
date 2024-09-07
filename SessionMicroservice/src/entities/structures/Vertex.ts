@@ -1,11 +1,11 @@
 
 import { Entity, PrimaryColumn, Column, ManyToOne } from "typeorm";
-import { Session } from "./Session";
+import { Session } from "../Session";
+import { BaseEntity } from "../BaseEntity";
+import { BaseStructureEntity } from "../base/BaseStructureEntity";
 
 @Entity('vertices')
-export class Vertex {
-  @PrimaryColumn('number')
-  id: number;
+export class Vertex extends BaseStructureEntity {
 
   @Column({nullable: true})
   xCord?: number;

@@ -1,9 +1,9 @@
 import { FindManyOptions, Repository } from "typeorm";
-import { SessionTypes } from "../entities/SessionTypes";
-import NotFoundError from "../error/4__Error/NotFoundError.error";
-import { AppDataSource } from "../dataSource";
-import { ISessionTypeRepositoryImpl } from "./impl/sessionTypeRepositoryImpl";
-import { sessionRouter } from '../router/sessionRouter';
+import { SessionTypes } from "../../entities/types/SessionTypes";
+import NotFoundError from "../../error/4__Error/NotFoundError.error";
+import { AppDataSource } from "../../dataSource";
+import { ISessionTypeRepositoryImpl } from "../impl/repos/sessionTypeRepositoryImpl";
+import { sessionRouter } from '../../router/sessionRouter';
 
 class SessionTypeRepository implements ISessionTypeRepositoryImpl{
     private sessionTypeRepository: Repository<SessionTypes>
@@ -28,7 +28,7 @@ class SessionTypeRepository implements ISessionTypeRepositoryImpl{
     public async setImage(imagePath: string, sessionTypeId: number): Promise<void>{
         try{
             const sessionType = await this.findSessionType(sessionTypeId)
-            sessionType.sessionTypeImagePath = imagePath
+            sessionType.imagePath = imagePath
         } catch(error){
             throw error
         }

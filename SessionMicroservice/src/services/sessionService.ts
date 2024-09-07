@@ -2,9 +2,9 @@ import { DeepPartial, FindOptionsWhere, Not, ObjectLiteral, Repository } from "t
 import { Session } from '../entities/Session';
 import { ISessionServiceImpl } from "./impl/sessionServiceImpl";
 import { ICreateSessionRequestDTO } from "../dto/request/CreateSessionRequestDTO";
-import { SessionStructures } from "../entities/SessionStructures";
-import { SessionTypes } from "../entities/SessionTypes";
-import { Alghorithm } from '../entities/Alghorithm';
+import { SessionStructures } from "../entities/types/SessionStructures";
+import { SessionTypes } from "../entities/types/SessionTypes";
+import { Alghorithm } from '../entities/types/Alghorithm';
 import { CheckUserExistsRequestMessage } from "../rabbitMQ/types/request/requestTypes";
 import producer from "../rabbitMQ/producer";
 import { CheckUserExistsResponse } from "../rabbitMQ/types/response/responseTypes";
@@ -14,19 +14,20 @@ import { IGetSessionStructuresResponseDTO } from "../dto/response/session/GetSes
 import { IGetAlgosResponseDTO } from "../dto/response/session/GetAlgosResponseDTO";
 import { IGetSessionTypesResponseDTO } from "../dto/response/session/GetSessionTypesResponseDTO";
 import { IUpdateSessionRequestDTO } from "../dto/request/updateSession/UpdateSessionRequestDTO";
-import { Vertex } from "../entities/Vertex";
-import { Edge } from "../entities/Edge";
-import { ISessionStructRepositoryImpl } from "../repository/impl/sessionStructRepositoryImpl";
-import { ISessionTypeRepositoryImpl } from "../repository/impl/sessionTypeRepositoryImpl";
-import { ISessionAlghoRepositoryImpl } from '../repository/impl/sessionAlghoRepositoryImpl';
+import { Vertex } from "../entities/structures/Vertex";
+import { Edge } from "../entities/structures/Edge";
+import { ISessionStructRepositoryImpl } from "../repository/impl/repos/sessionStructRepositoryImpl";
+import { ISessionTypeRepositoryImpl } from "../repository/impl/repos/sessionTypeRepositoryImpl";
+import { ISessionAlghoRepositoryImpl } from '../repository/impl/repos/sessionAlghoRepositoryImpl';
 import { IUpdateOrDeleteSessionVertexRequestDTO } from "../dto/request/updateSession/updateSessionData/UpdateSessionVertexRequestDTO";
 import { IUpdateOrDeleteSessionEdgeRequestDTO } from "../dto/request/updateSession/updateSessionData/UpdateSessionEdgeRequestDTO";
 import { AppDataSource } from "../dataSource";
-import sessionStructRepository from "../repository/sessionStructRepository";
-import sessionTypeRepository from "../repository/sessionTypeRepository";
-import sessionAlghoRepository from "../repository/sessionAlghoRepository";
+import sessionStructRepository from "../repository/repos/sessionStructRepository";
+import sessionTypeRepository from "../repository/repos/sessionTypeRepository";
+import sessionAlghoRepository from "../repository/repos/sessionAlghoRepository";
 import * as fs from 'fs'
 import * as path from 'path'
+import { IVertex } from "../dto/request/updateSession/interfaces/vertex";
 
 class SessionService implements ISessionServiceImpl{
     private sessionRepository: Repository<Session>
@@ -64,7 +65,7 @@ class SessionService implements ISessionServiceImpl{
         await repository.delete(id);
     }
 
-    private async createOrUpdateEntity<T extends ObjectLiteral>(
+    private async createOrUpdateEntity<T extends DeepPartial<Vertex | Edge>>(
         repository: Repository<T>, 
         data: DeepPartial<T>, 
         where?: FindOptionsWhere<T>
@@ -82,11 +83,16 @@ class SessionService implements ISessionServiceImpl{
     
 
     private async updateVertices(updateVertices: IUpdateOrDeleteSessionVertexRequestDTO[], sessionId: string) {
+        const creatOperationVertices: IVertex[] = []
+        const updateOperationVertices: IVertex[] = []
         for (const updateVertex of updateVertices) {
-            if (updateVertex.updateType === 'delete') {
+            const updateType = updateVertex.updateType
+            if (updateType === 'delete') {
                 await this.deleteEntity(this.sessionVertexRepository, updateVertex.id);
             } else {
                 const vertex = updateVertex.vertex!
+                const whereCondition = updateType === 'update' ? vertex.vertexId : undefined
+                whereCondition ? updateOperationVertices.push(vertex) : creatOperationVertices.push(vertex)
                 await this.createOrUpdateEntity(this.sessionVertexRepository, {
                     vertexId: vertex.vertexId,
                     xCord: vertex.xCord,
@@ -94,17 +100,19 @@ class SessionService implements ISessionServiceImpl{
                     isShortest: vertex.isShortest,
                     pair: vertex.pair,
                     session: await this.sessionRepository.findOne({ where: { id: sessionId } }) as Session
-                }as DeepPartial<Vertex>);
+                }as DeepPartial<Vertex>, whereCondition as FindOptionsWhere<Vertex> | undefined);
             }
         }
     }
 
     private async updateEdges(updateEdges: IUpdateOrDeleteSessionEdgeRequestDTO[], sessionId: string) {
         for (const updateEdge of updateEdges) {
-            if (updateEdge.updateType === 'delete') {
+            const updateType = updateEdge.updateType
+            if (updateType === 'delete') {
                 await this.deleteEntity(this.sessionEdgeRepository, updateEdge.id);
             } else {
                 const edge = updateEdge.edge!
+                const whereCondition = updateType === 'update' ? edge.id : undefined
                 await this.createOrUpdateEntity(this.sessionEdgeRepository, {
                     edgeId: edge.id,
                     weight: edge.weight,
@@ -114,7 +122,7 @@ class SessionService implements ISessionServiceImpl{
                     startVertex: edge.startVertex,
                     endVertex: edge.endVertex,
                     session: await this.sessionRepository.findOne({ where: { id: sessionId } }) as Session
-                }as DeepPartial<Edge>);
+                }as DeepPartial<Edge>, whereCondition as FindOptionsWhere<Edge> | undefined);
             }
         }
     }
@@ -137,8 +145,8 @@ class SessionService implements ISessionServiceImpl{
             await this.sessionRepository.save(session)
             const response: ICreateSessionResponseDTO = {
                 id: session.id, 
-                sessionType: session.sessionType.sessionTypeName,
-                sessionStruct: session.sessionType.sessionTypeName
+                sessionType: session.sessionType.name,
+                sessionStruct: session.structType.name
             }
             return response
         } catch(error){
@@ -148,10 +156,10 @@ class SessionService implements ISessionServiceImpl{
     }    
     async getSessionTypes(): Promise<IGetSessionTypesResponseDTO[]> {
         try {
-            const sessionTypes = await this.sessionTypeRepository.findAll({select: ['sessionTypeName', 'sessionTypeImagePath']})
+            const sessionTypes = await this.sessionTypeRepository.findAll({select: ['name', 'imagePath']})
             const response: Promise<IGetSessionTypesResponseDTO>[] = sessionTypes.map(async sessionType => ({
-                sessionTypeName: sessionType.sessionTypeName,
-                sessionImage: sessionType.sessionTypeImagePath
+                sessionTypeName: sessionType.name,
+                sessionImage: sessionType.imagePath
             }))
             return await Promise.all(response)
         } catch (error) {
@@ -162,12 +170,12 @@ class SessionService implements ISessionServiceImpl{
     async getAlgosByStruct(): Promise<IGetAlgosResponseDTO[]> {
         try {
             const alghorithms = await this.sessionAlghorithmRepository.findAll(
-                {select: ['alghorithmName', 'alghorithmImagePath', 'alghorithmDescription']}
+                {select: ['name', 'imagePath', 'description']}
             )
             const response: Promise<IGetAlgosResponseDTO>[] = alghorithms.map(async alghorithm => ({
-                alghorithm: alghorithm.alghorithmName,
-                alghorithmDescription: alghorithm.alghorithmDescription,
-                alghorithmImage: alghorithm.alghorithmImagePath
+                alghorithm: alghorithm.name,
+                alghorithmDescription: alghorithm.description,
+                alghorithmImage: alghorithm.imagePath
             }))
             return await Promise.all(response)
         } catch (error) {
@@ -178,12 +186,12 @@ class SessionService implements ISessionServiceImpl{
     async getSessionStructures(): Promise<IGetSessionStructuresResponseDTO[]> {
         try {
             const structures = await this.sessionStructRepository.findAll(
-                {select: ['sessionStructureName', 'structDescription', 'sessionStructureImagePath']}
+                {select: ['name', 'description', 'imagePath']}
             )
             const response: Promise<IGetSessionStructuresResponseDTO>[] = structures.map(async structure => ({
-                sessionStructureName: structure.sessionStructureName,
-                structDescription: structure.structDescription,
-                sessionStructureImage: structure.sessionStructureImagePath
+                sessionStructureName: structure.name,
+                structDescription: structure.description,
+                sessionStructureImage: structure.imagePath
             }))
             return await Promise.all(response)
         } catch (error) {

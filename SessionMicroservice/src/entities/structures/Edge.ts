@@ -1,10 +1,10 @@
-import { Session } from "./Session";
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { BaseStructureEntity } from "../base/BaseStructureEntity";
+import { BaseEntity } from "../BaseEntity";
+import { Session } from "../Session";
+import { Entity, PrimaryColumn, Column, ManyToOne } from "typeorm";
 
 @Entity('edges')
-export class Edge {
-  @PrimaryGeneratedColumn('uuid')
-  id: number;
+export class Edge extends BaseStructureEntity {
 
   @Column({ nullable: true })
   left?: number;
@@ -23,9 +23,6 @@ export class Edge {
 
   @Column()
   endVertex: number;
-
-  @Column({ default: false })
-  isShortest: boolean;
 
   @ManyToOne(() => Session, session => session.edges, {nullable: true})
   session?: Session;
