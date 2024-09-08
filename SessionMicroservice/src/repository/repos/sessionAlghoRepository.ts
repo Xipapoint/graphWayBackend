@@ -10,7 +10,7 @@ class SessionAlghoRepository extends BaseRepository<Alghorithm> implements ISess
     constructor(
         sessionAlghorithmRepository: Repository<Alghorithm>, 
     ){
-        super();
+        super(Alghorithm);
         this.sessionAlghorithmRepository = sessionAlghorithmRepository
 
     }

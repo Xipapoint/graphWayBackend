@@ -1,10 +1,7 @@
-import { DeepPartial, FindOptionsWhere, Not, ObjectLiteral, Repository } from "typeorm";
+import { BaseEntity, DeepPartial, FindOptionsWhere, Not, ObjectLiteral, Repository } from "typeorm";
 import { Session } from '../entities/Session';
 import { ISessionServiceImpl } from "./impl/sessionServiceImpl";
 import { ICreateSessionRequestDTO } from "../dto/request/CreateSessionRequestDTO";
-import { SessionStructures } from "../entities/types/SessionStructures";
-import { SessionTypes } from "../entities/types/SessionTypes";
-import { Alghorithm } from '../entities/types/Alghorithm';
 import { CheckUserExistsRequestMessage } from "../rabbitMQ/types/request/requestTypes";
 import producer from "../rabbitMQ/producer";
 import { CheckUserExistsResponse } from "../rabbitMQ/types/response/responseTypes";
@@ -27,22 +24,28 @@ import sessionTypeRepository from "../repository/repos/sessionTypeRepository";
 import sessionAlghoRepository from "../repository/repos/sessionAlghoRepository";
 import * as fs from 'fs'
 import * as path from 'path'
-import { IVertex } from "../dto/request/updateSession/interfaces/vertex";
+import { BaseRepository } from "../repository/baseRepository";
+import { IVertexRepositoryImpl } from "../repository/impl/repos/vertexRepositoryImpl";
+import VertexRepository from "../repository/repos/vertexRepository";
+import { IBaseRepositoryImpl } from "../repository/impl/baseRepositoryImpl";
+import { IEdgeRepositoryImpl } from "../repository/impl/repos/edgeRepositoryImpl";
+import edgeRepository from "../repository/repos/edgeRepository";
+import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 
 class SessionService implements ISessionServiceImpl{
     private sessionRepository: Repository<Session>
     private sessionStructRepository: ISessionStructRepositoryImpl
     private sessionTypeRepository: ISessionTypeRepositoryImpl
     private sessionAlghorithmRepository: ISessionAlghoRepositoryImpl
-    private sessionVertexRepository: Repository<Vertex>
-    private sessionEdgeRepository: Repository<Edge>;
+    private sessionVertexRepository: IVertexRepositoryImpl
+    private sessionEdgeRepository:  IEdgeRepositoryImpl;
     constructor(
         sessionRepository: Repository<Session>, 
         sessionStructRepository: ISessionStructRepositoryImpl,
         sessionTypeRepository: ISessionTypeRepositoryImpl, 
         sessionAlghorithmRepository: ISessionAlghoRepositoryImpl,
-        sessionVertexRepository: Repository<Vertex>,
-        sessionEdgeRepository: Repository<Edge>
+        sessionVertexRepository: IVertexRepositoryImpl,
+        sessionEdgeRepository: IEdgeRepositoryImpl
     ){
         this.sessionRepository = sessionRepository
         this.sessionStructRepository = sessionStructRepository
@@ -61,16 +64,17 @@ class SessionService implements ISessionServiceImpl{
         if (!responseRabbitMQ.isUserExists) throw new NotFoundError("User doesnt exist");
     }
 
-    private async deleteEntity(repository: Repository<any>, id: number): Promise<void> {
-        await repository.delete(id);
+    private async deleteEntity<K extends BaseEntity, T extends BaseRepository<K>>(repository: IBaseRepositoryImpl<T>, ids: number[]): Promise<void> {
+        await repository.batchDeleteEntities(ids)
     }
 
-    private async createOrUpdateEntity<T extends DeepPartial<Vertex | Edge>>(
-        repository: Repository<T>, 
-        data: DeepPartial<T>, 
+    private async createOrUpdateEntity<K extends BaseEntity, T extends BaseRepository<K>>(
+        repository: IBaseRepositoryImpl<T>, 
+        data: QueryDeepPartialEntity<T>, 
         where?: FindOptionsWhere<T>
     ): Promise<void> {
         if (where) {
+            repository.batchUpdateEntity(data, where)
             const entity = await repository.findOne({ where });
             if (!entity) throw new NotFoundError(`Entity with the specified condition not found: ${where}`);
             Object.assign(entity, data);
@@ -85,7 +89,7 @@ class SessionService implements ISessionServiceImpl{
     private async updateVertices(updateVertices: IUpdateOrDeleteSessionVertexRequestDTO[], sessionId: string) {
         const creatOperationVertices = []
         const updateOperationVertices = []
-        const deleteOperationVertices = []
+        const deleteOperationVertices: number[] = []
         for (const updateVertex of updateVertices) {
             const updateType = updateVertex.updateType
             if (updateType === 'delete') {
@@ -94,24 +98,28 @@ class SessionService implements ISessionServiceImpl{
                 const vertex = updateVertex.vertex!
                 const whereCondition = updateType === 'update' ? vertex.vertexId : undefined
                 whereCondition ? updateOperationVertices.push(vertex) : creatOperationVertices.push(vertex)
-                await this.createOrUpdateEntity(this.sessionVertexRepository, {
-                    vertexId: vertex.vertexId,
-                    xCord: vertex.xCord,
-                    yCord: vertex.yCord,
-                    isShortest: vertex.isShortest,
-                    pair: vertex.pair,
-                    session: await this.sessionRepository.findOne({ where: { id: sessionId } }) as Session
-                }as DeepPartial<Vertex>, whereCondition as FindOptionsWhere<Vertex> | undefined);
+                // await this.createOrUpdateEntity(this.sessionVertexRepository, {
+                //     vertexId: vertex.vertexId,
+                //     xCord: vertex.xCord,
+                //     yCord: vertex.yCord,
+                //     isShortest: vertex.isShortest,
+                //     pair: vertex.pair,
+                //     session: await this.sessionRepository.findOne({ where: { id: sessionId } }) as Session
+                // }as DeepPartial<Vertex>, whereCondition as FindOptionsWhere<Vertex> | undefined);
             }
         }
-        
+        await this.deleteEntity(this.sessionVertexRepository, deleteOperationVertices)
+        await this.createOrUpdateEntity()
     }
 
     private async updateEdges(updateEdges: IUpdateOrDeleteSessionEdgeRequestDTO[], sessionId: string) {
+        const creatOperationVertices = []
+        const updateOperationVertices = []
+        const deleteOperationVertices: number[] = []
         for (const updateEdge of updateEdges) {
             const updateType = updateEdge.updateType
             if (updateType === 'delete') {
-                await this.deleteEntity(this.sessionEdgeRepository, updateEdge.id);
+                deleteOperationVertices.push(updateEdge.id)
             } else {
                 const edge = updateEdge.edge!
                 const whereCondition = updateType === 'update' ? edge.id : undefined
@@ -127,6 +135,7 @@ class SessionService implements ISessionServiceImpl{
                 }as DeepPartial<Edge>, whereCondition as FindOptionsWhere<Edge> | undefined);
             }
         }
+        await this.deleteEntity(this.sessionEdgeRepository, deleteOperationVertices)
     }
 
     //PUBLIC
@@ -245,6 +254,6 @@ export default new SessionService(
     sessionStructRepository, 
     sessionTypeRepository, 
     sessionAlghoRepository, 
-    AppDataSource.getRepository(Vertex), 
-    AppDataSource.getRepository(Edge)
+    VertexRepository, 
+    edgeRepository
 )

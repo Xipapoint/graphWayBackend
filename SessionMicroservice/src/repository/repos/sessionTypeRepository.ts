@@ -11,7 +11,7 @@ class SessionTypeRepository extends BaseRepository<SessionTypes> implements ISes
     constructor(
         sessionTypeRepository: Repository<SessionTypes>, 
     ){
-        super()
+        super(SessionTypes)
         this.sessionTypeRepository = sessionTypeRepository
 
     }
