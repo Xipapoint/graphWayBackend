@@ -83,12 +83,13 @@ class SessionService implements ISessionServiceImpl{
     
 
     private async updateVertices(updateVertices: IUpdateOrDeleteSessionVertexRequestDTO[], sessionId: string) {
-        const creatOperationVertices: IVertex[] = []
-        const updateOperationVertices: IVertex[] = []
+        const creatOperationVertices = []
+        const updateOperationVertices = []
+        const deleteOperationVertices = []
         for (const updateVertex of updateVertices) {
             const updateType = updateVertex.updateType
             if (updateType === 'delete') {
-                await this.deleteEntity(this.sessionVertexRepository, updateVertex.id);
+                deleteOperationVertices.push(updateVertex.id)
             } else {
                 const vertex = updateVertex.vertex!
                 const whereCondition = updateType === 'update' ? vertex.vertexId : undefined
@@ -103,6 +104,7 @@ class SessionService implements ISessionServiceImpl{
                 }as DeepPartial<Vertex>, whereCondition as FindOptionsWhere<Vertex> | undefined);
             }
         }
+        
     }
 
     private async updateEdges(updateEdges: IUpdateOrDeleteSessionEdgeRequestDTO[], sessionId: string) {

@@ -4,12 +4,14 @@ import NotFoundError from "../../error/4__Error/NotFoundError.error";
 import { AppDataSource } from "../../dataSource";
 import { ISessionTypeRepositoryImpl } from "../impl/repos/sessionTypeRepositoryImpl";
 import { sessionRouter } from '../../router/sessionRouter';
+import { BaseRepository } from "../baseRepository";
 
-class SessionTypeRepository implements ISessionTypeRepositoryImpl{
+class SessionTypeRepository extends BaseRepository<SessionTypes> implements ISessionTypeRepositoryImpl{
     private sessionTypeRepository: Repository<SessionTypes>
     constructor(
         sessionTypeRepository: Repository<SessionTypes>, 
     ){
+        super()
         this.sessionTypeRepository = sessionTypeRepository
 
     }

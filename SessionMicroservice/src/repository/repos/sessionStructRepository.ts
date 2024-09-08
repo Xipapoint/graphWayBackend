@@ -3,12 +3,14 @@ import { AppDataSource } from "../../dataSource";
 import { SessionStructures } from "../../entities/types/SessionStructures";
 import NotFoundError from "../../error/4__Error/NotFoundError.error";
 import { ISessionStructRepositoryImpl } from "../impl/repos/sessionStructRepositoryImpl";
+import { BaseRepository } from "../baseRepository";
 
-class SessionStructService implements ISessionStructRepositoryImpl{
+class SessionStructService extends BaseRepository<SessionStructures> implements ISessionStructRepositoryImpl{
     private sessionStructRepository: Repository<SessionStructures>
     constructor(
         sessionStructRepository: Repository<SessionStructures> 
     ){
+        super()
         this.sessionStructRepository = sessionStructRepository
 
     }

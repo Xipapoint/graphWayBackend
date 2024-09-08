@@ -3,12 +3,14 @@ import { AppDataSource } from "../../dataSource";
 import { Alghorithm } from "../../entities/types/Alghorithm";
 import NotFoundError from "../../error/4__Error/NotFoundError.error";
 import { ISessionAlghoRepositoryImpl } from "../impl/repos/sessionAlghoRepositoryImpl";
+import { BaseRepository } from "../baseRepository";
 
-class SessionAlghoRepository implements ISessionAlghoRepositoryImpl{
+class SessionAlghoRepository extends BaseRepository<Alghorithm> implements ISessionAlghoRepositoryImpl{
     private sessionAlghorithmRepository: Repository<Alghorithm>
     constructor(
         sessionAlghorithmRepository: Repository<Alghorithm>, 
     ){
+        super();
         this.sessionAlghorithmRepository = sessionAlghorithmRepository
 
     }
