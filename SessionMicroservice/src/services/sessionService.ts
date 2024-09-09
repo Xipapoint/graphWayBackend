@@ -211,7 +211,6 @@ class SessionService implements ISessionServiceImpl{
             const sessionId = sessionUpdate.sessionId
             const session = await this.sessionRepository.findOne({where: {id: sessionId}})
             if(!session) throw new NotFoundError("Session doesnt exist")
-            const imageBase64 = sessionUpdate.imageBase64
             const vertices = sessionUpdate.vertices
             const edges = sessionUpdate.edges
             if(vertices){
@@ -221,10 +220,11 @@ class SessionService implements ISessionServiceImpl{
                 await this. updateEdges(edges, manager)
             }
             let imagePath: string | undefined;
-    
+            const imageBase64 = sessionUpdate.imageBase64
+            let filename: string
             if (imageBase64) {
               const base64Data = imageBase64.replace(/^data:image\/png;base64,/, '');
-              const filename = `${Date.now()}_${sessionId}.png`;
+              filename = `${Date.now()}_${sessionId}.png`;
               const filePath = path.join(__dirname, 'uploads', filename); 
         
               fs.writeFileSync(filePath, base64Data, 'base64');
