@@ -13,7 +13,7 @@ export interface ISessionServiceImpl{
     getSessionTypes(): Promise<IGetSessionTypesResponseDTO[]>
     getSessionStructures(): Promise<IGetSessionStructuresResponseDTO[]>
     getAlgosByStruct(): Promise<IGetAlgosResponseDTO[]>
-    updateSession(sessionUpdate: IUpdateSessionRequestDTO): Promise<Session>
+    updateSession(sessionUpdate: IUpdateSessionRequestDTO): Promise<boolean>
     deleteSession(): Promise<boolean>
     changeNameSession(): Promise<string>
     getSessionsByUserId(): Promise<Session[]>

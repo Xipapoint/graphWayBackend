@@ -1,4 +1,4 @@
-import { BaseEntity, DeepPartial, FindOptionsWhere, Not, ObjectLiteral, Repository } from "typeorm";
+import { BaseEntity, DeepPartial, EntityManager, FindOptionsWhere, Not, ObjectLiteral, Repository, Entity } from 'typeorm';
 import { Session } from '../entities/Session';
 import { ISessionServiceImpl } from "./impl/sessionServiceImpl";
 import { ICreateSessionRequestDTO } from "../dto/request/CreateSessionRequestDTO";
@@ -31,6 +31,8 @@ import { IBaseRepositoryImpl } from "../repository/impl/baseRepositoryImpl";
 import { IEdgeRepositoryImpl } from "../repository/impl/repos/edgeRepositoryImpl";
 import edgeRepository from "../repository/repos/edgeRepository";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
+import { IVertex } from "../dto/request/updateSession/interfaces/vertex";
+import { IEdge } from "../dto/request/updateSession/interfaces/edge";
 
 class SessionService implements ISessionServiceImpl{
     private sessionRepository: Repository<Session>
@@ -64,78 +66,71 @@ class SessionService implements ISessionServiceImpl{
         if (!responseRabbitMQ.isUserExists) throw new NotFoundError("User doesnt exist");
     }
 
-    private async deleteEntity<K extends BaseEntity, T extends BaseRepository<K>>(repository: IBaseRepositoryImpl<T>, ids: number[]): Promise<void> {
-        await repository.batchDeleteEntities(ids)
+    private async deleteEntity<T extends ObjectLiteral>(repository: IBaseRepositoryImpl<T>, ids: number[], manager: EntityManager): Promise<void> {
+        await repository.batchDeleteEntities(ids, manager)
     }
 
-    private async createOrUpdateEntity<K extends BaseEntity, T extends BaseRepository<K>>(
-        repository: IBaseRepositoryImpl<T>, 
-        data: QueryDeepPartialEntity<T>, 
-        where?: FindOptionsWhere<T>
+    private async createOrUpdateEntity<T extends ObjectLiteral>(
+        repository: IBaseRepositoryImpl<T>,
+        createData: Array<object>, 
+        updateData: Array<object>,
+        ids: number[],
+        manager: EntityManager
     ): Promise<void> {
-        if (where) {
-            repository.batchUpdateEntity(data, where)
-            const entity = await repository.findOne({ where });
-            if (!entity) throw new NotFoundError(`Entity with the specified condition not found: ${where}`);
-            Object.assign(entity, data);
-            await repository.save(entity);
-        } else {
-            const createdEntity = repository.create(data);
-            await repository.save(createdEntity);
-        }
+        createData.length !== 0 ? repository.batchCreateEntity(createData, manager) : null
+        updateData.length !== 0 ? repository.batchUpdateEntity(updateData, ids, manager) : null
     }
     
 
-    private async updateVertices(updateVertices: IUpdateOrDeleteSessionVertexRequestDTO[], sessionId: string) {
+    private async updateVertices(updateVertices: IUpdateOrDeleteSessionVertexRequestDTO[], manager: EntityManager) {
         const creatOperationVertices = []
         const updateOperationVertices = []
         const deleteOperationVertices: number[] = []
+        const ids = []
         for (const updateVertex of updateVertices) {
             const updateType = updateVertex.updateType
+            ids.push(updateVertex.id)
             if (updateType === 'delete') {
                 deleteOperationVertices.push(updateVertex.id)
             } else {
                 const vertex = updateVertex.vertex!
                 const whereCondition = updateType === 'update' ? vertex.vertexId : undefined
                 whereCondition ? updateOperationVertices.push(vertex) : creatOperationVertices.push(vertex)
-                // await this.createOrUpdateEntity(this.sessionVertexRepository, {
-                //     vertexId: vertex.vertexId,
-                //     xCord: vertex.xCord,
-                //     yCord: vertex.yCord,
-                //     isShortest: vertex.isShortest,
-                //     pair: vertex.pair,
-                //     session: await this.sessionRepository.findOne({ where: { id: sessionId } }) as Session
-                // }as DeepPartial<Vertex>, whereCondition as FindOptionsWhere<Vertex> | undefined);
             }
         }
-        await this.deleteEntity(this.sessionVertexRepository, deleteOperationVertices)
-        await this.createOrUpdateEntity()
+        await this.deleteEntity<Vertex>(this.sessionVertexRepository, deleteOperationVertices, manager)
+        await this.createOrUpdateEntity<Vertex>(
+            this.sessionVertexRepository,
+            creatOperationVertices,
+            updateOperationVertices,
+            ids,
+            manager
+        )
     }
 
-    private async updateEdges(updateEdges: IUpdateOrDeleteSessionEdgeRequestDTO[], sessionId: string) {
-        const creatOperationVertices = []
-        const updateOperationVertices = []
-        const deleteOperationVertices: number[] = []
+    private async updateEdges(updateEdges: IUpdateOrDeleteSessionEdgeRequestDTO[], manager: EntityManager) {
+        const createOperationEdges: IEdge[] = []
+        const updateOperationEdges: IEdge[] = []
+        const deleteOperationEdges: number[] = []
+        const ids: number[] = []
         for (const updateEdge of updateEdges) {
             const updateType = updateEdge.updateType
             if (updateType === 'delete') {
-                deleteOperationVertices.push(updateEdge.id)
+                deleteOperationEdges.push(updateEdge.id)
             } else {
                 const edge = updateEdge.edge!
                 const whereCondition = updateType === 'update' ? edge.id : undefined
-                await this.createOrUpdateEntity(this.sessionEdgeRepository, {
-                    edgeId: edge.id,
-                    weight: edge.weight,
-                    left: edge.left,
-                    top: edge.top,
-                    angle: edge.angle,
-                    startVertex: edge.startVertex,
-                    endVertex: edge.endVertex,
-                    session: await this.sessionRepository.findOne({ where: { id: sessionId } }) as Session
-                }as DeepPartial<Edge>, whereCondition as FindOptionsWhere<Edge> | undefined);
+                whereCondition ? updateOperationEdges.push(edge) : createOperationEdges.push(edge)
             }
         }
-        await this.deleteEntity(this.sessionEdgeRepository, deleteOperationVertices)
+        await this.deleteEntity<Edge>(this.sessionVertexRepository, deleteOperationEdges, manager)
+        await this.createOrUpdateEntity<Edge>(
+            this.sessionEdgeRepository,
+            createOperationEdges,
+            updateOperationEdges,
+            ids,
+            manager
+        )
     }
 
     //PUBLIC
@@ -211,32 +206,34 @@ class SessionService implements ISessionServiceImpl{
         }
     }
 
-    async updateSession(sessionUpdate: IUpdateSessionRequestDTO): Promise<Session> {
-        const sessionId = sessionUpdate.sessionId
-        const session = await this.sessionRepository.findOne({where: {id: sessionId}})
-        if(!session) throw new NotFoundError("Session doesnt exist")
-        const imageBase64 = sessionUpdate.imageBase64
-        const vertices = sessionUpdate.vertices
-        const edges = sessionUpdate.edges
-        if(vertices){
-            await this.updateVertices(vertices, sessionId)
-        }
-        if(edges){
-            await this. updateEdges(edges, sessionId)
-        }
-        let imagePath: string | undefined;
-
-        if (imageBase64) {
-          const base64Data = imageBase64.replace(/^data:image\/png;base64,/, '');
-          const filename = `${Date.now()}_${sessionId}.png`;
-          const filePath = path.join(__dirname, 'uploads', filename); 
+    async updateSession(sessionUpdate: IUpdateSessionRequestDTO): Promise<boolean> {
+        await this.sessionRepository.manager.transaction(async (manager: EntityManager) => {
+            const sessionId = sessionUpdate.sessionId
+            const session = await this.sessionRepository.findOne({where: {id: sessionId}})
+            if(!session) throw new NotFoundError("Session doesnt exist")
+            const imageBase64 = sessionUpdate.imageBase64
+            const vertices = sessionUpdate.vertices
+            const edges = sessionUpdate.edges
+            if(vertices){
+                await this.updateVertices(vertices, manager)
+            }
+            if(edges){
+                await this. updateEdges(edges, manager)
+            }
+            let imagePath: string | undefined;
     
-          fs.writeFileSync(filePath, base64Data, 'base64');
-          imagePath = filePath;
-        }
-        session.sessionImagePath = imagePath
-        await this.sessionRepository.save(session)
-        return session
+            if (imageBase64) {
+              const base64Data = imageBase64.replace(/^data:image\/png;base64,/, '');
+              const filename = `${Date.now()}_${sessionId}.png`;
+              const filePath = path.join(__dirname, 'uploads', filename); 
+        
+              fs.writeFileSync(filePath, base64Data, 'base64');
+              imagePath = filePath;
+            }
+            session.sessionImagePath = imagePath
+            await manager.save(session)
+        })
+        return true
     }
     deleteSession(): Promise<boolean> {
         throw new Error("Method not implemented.");
