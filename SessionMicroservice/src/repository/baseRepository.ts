@@ -5,6 +5,7 @@ import { AppDataSource } from "../dataSource";
 import NotFoundError from "../error/4__Error/NotFoundError.error";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { Vertex } from "../entities/structures/Vertex";
+import { IVertex } from "../dto/request/updateSession/interfaces/vertex";
 
 
 
@@ -23,7 +24,7 @@ export class BaseRepository<T extends ObjectLiteral> implements IBaseRepositoryI
         .values(createData)
         .execute()
     }
-    async batchUpdateEntity(updateData: object, ids: number[], manager: EntityManager): Promise<void> {
+    async batchUpdateEntity(updateData: IVertex[], ids: number[], manager: EntityManager): Promise<void> {
         manager.createQueryBuilder()
         .update(this.baseEntityTarget)
         .set(updateData)
