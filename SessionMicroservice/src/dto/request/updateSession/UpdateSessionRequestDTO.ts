@@ -1,4 +1,4 @@
-import { IVertex } from './interfaces/vertex';
+import { IVertex } from './interfaces/structures/vertex';
 import { IUpdateOrDeleteSessionEdgeRequestDTO } from './updateSessionData/UpdateSessionEdgeRequestDTO';
 import { IUpdateOrDeleteSessionVertexRequestDTO } from './updateSessionData/UpdateSessionVertexRequestDTO';
 

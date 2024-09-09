@@ -31,8 +31,9 @@ import { IBaseRepositoryImpl } from "../repository/impl/baseRepositoryImpl";
 import { IEdgeRepositoryImpl } from "../repository/impl/repos/edgeRepositoryImpl";
 import edgeRepository from "../repository/repos/edgeRepository";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
-import { IVertex } from "../dto/request/updateSession/interfaces/vertex";
-import { IEdge } from "../dto/request/updateSession/interfaces/edge";
+import { IVertex } from "../dto/request/updateSession/interfaces/structures/vertex";
+import { IEdge } from "../dto/request/updateSession/interfaces/structures/edge";
+import { IBaseCreateOrUpdateRequestDTO } from '../dto/request/updateSession/BaseCreateOrUpdateRequestDTO';
 
 class SessionService implements ISessionServiceImpl{
     private sessionRepository: Repository<Session>
@@ -72,29 +73,32 @@ class SessionService implements ISessionServiceImpl{
 
     private async createOrUpdateEntity<T extends ObjectLiteral>(
         repository: IBaseRepositoryImpl<T>,
-        createData: Array<object>, 
-        updateData: Array<object>,
-        ids: number[],
-        manager: EntityManager
+        createData: IBaseCreateOrUpdateRequestDTO<T>[], 
+        updateData: IBaseCreateOrUpdateRequestDTO<T>[],
+        manager: EntityManager,
+        sessionId: string
     ): Promise<void> {
-        createData.length !== 0 ? repository.batchCreateEntity(createData, manager) : null
-        updateData.length !== 0 ? repository.batchUpdateEntity(updateData, ids, manager) : null
+        const session = await this.sessionRepository.findOne({where: {id: sessionId}})
+        createData.length !== 0 ? repository.batchCreateEntity(createData, manager, session!) : null
+        updateData.length !== 0
+            ? updateData.forEach(data => {
+                repository.batchUpdateEntity(data, data.id, manager)     
+            })
+            : null
     }
     
 
-    private async updateVertices(updateVertices: IUpdateOrDeleteSessionVertexRequestDTO[], manager: EntityManager) {
-        const creatOperationVertices = []
-        const updateOperationVertices = []
+    private async updateVertices(updateVertices: IUpdateOrDeleteSessionVertexRequestDTO[], manager: EntityManager, sessionId: string) {
+        const creatOperationVertices: IVertex<Vertex>[] = []
+        const updateOperationVertices: IVertex<Vertex>[] = []
         const deleteOperationVertices: number[] = []
-        const ids = []
         for (const updateVertex of updateVertices) {
             const updateType = updateVertex.updateType
-            ids.push(updateVertex.id)
             if (updateType === 'delete') {
                 deleteOperationVertices.push(updateVertex.id)
             } else {
                 const vertex = updateVertex.vertex!
-                const whereCondition = updateType === 'update' ? vertex.vertexId : undefined
+                const whereCondition = updateType === 'update' ? vertex.id : undefined
                 whereCondition ? updateOperationVertices.push(vertex) : creatOperationVertices.push(vertex)
             }
         }
@@ -103,14 +107,14 @@ class SessionService implements ISessionServiceImpl{
             this.sessionVertexRepository,
             creatOperationVertices,
             updateOperationVertices,
-            ids,
-            manager
+            manager,
+            sessionId
         )
     }
 
-    private async updateEdges(updateEdges: IUpdateOrDeleteSessionEdgeRequestDTO[], manager: EntityManager) {
-        const createOperationEdges: IEdge[] = []
-        const updateOperationEdges: IEdge[] = []
+    private async updateEdges(updateEdges: IUpdateOrDeleteSessionEdgeRequestDTO[], manager: EntityManager, sessionId: string) {
+        const createOperationEdges: IEdge<Edge>[] = []
+        const updateOperationEdges: IEdge<Edge>[] = []
         const deleteOperationEdges: number[] = []
         const ids: number[] = []
         for (const updateEdge of updateEdges) {
@@ -128,8 +132,8 @@ class SessionService implements ISessionServiceImpl{
             this.sessionEdgeRepository,
             createOperationEdges,
             updateOperationEdges,
-            ids,
-            manager
+            manager,
+            sessionId
         )
     }
 
@@ -214,10 +218,10 @@ class SessionService implements ISessionServiceImpl{
             const vertices = sessionUpdate.vertices
             const edges = sessionUpdate.edges
             if(vertices){
-                await this.updateVertices(vertices, manager)
+                await this.updateVertices(vertices, manager, sessionId)
             }
             if(edges){
-                await this. updateEdges(edges, manager)
+                await this. updateEdges(edges, manager, sessionId)
             }
             let imagePath: string | undefined;
             const imageBase64 = sessionUpdate.imageBase64
