@@ -161,7 +161,8 @@ class SessionService implements ISessionServiceImpl{
             console.error(error)
             throw error
         }
-    }    
+    } 
+       
     async getSessionTypes(): Promise<IGetSessionTypesResponseDTO[]> {
         try {
             const sessionTypes = await this.sessionTypeRepository.findAll({select: ['name', 'imagePath']})
