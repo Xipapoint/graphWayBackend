@@ -1,4 +1,4 @@
-import { BaseEntity, DeepPartial, EntityManager, FindOptionsWhere, Not, ObjectLiteral, Repository, Entity } from 'typeorm';
+import { EntityManager, ObjectLiteral, Repository } from 'typeorm';
 import { Session } from '../entities/Session';
 import { ISessionServiceImpl } from "./impl/sessionServiceImpl";
 import { ICreateSessionRequestDTO } from "../dto/request/CreateSessionRequestDTO";
@@ -24,13 +24,11 @@ import sessionTypeRepository from "../repository/repos/sessionTypeRepository";
 import sessionAlghoRepository from "../repository/repos/sessionAlghoRepository";
 import * as fs from 'fs'
 import * as path from 'path'
-import { BaseRepository } from "../repository/baseRepository";
 import { IVertexRepositoryImpl } from "../repository/impl/repos/vertexRepositoryImpl";
 import VertexRepository from "../repository/repos/vertexRepository";
 import { IBaseRepositoryImpl } from "../repository/impl/baseRepositoryImpl";
 import { IEdgeRepositoryImpl } from "../repository/impl/repos/edgeRepositoryImpl";
 import edgeRepository from "../repository/repos/edgeRepository";
-import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { IVertex } from "../dto/request/updateSession/interfaces/structures/vertex";
 import { IEdge } from "../dto/request/updateSession/interfaces/structures/edge";
 import { IBaseCreateOrUpdateRequestDTO } from '../dto/request/updateSession/BaseCreateOrUpdateRequestDTO';
@@ -116,7 +114,7 @@ class SessionService implements ISessionServiceImpl{
         const createOperationEdges: IEdge<Edge>[] = []
         const updateOperationEdges: IEdge<Edge>[] = []
         const deleteOperationEdges: number[] = []
-        const ids: number[] = []
+        const promises: Promise<void>[] = []
         for (const updateEdge of updateEdges) {
             const updateType = updateEdge.updateType
             if (updateType === 'delete') {
@@ -127,14 +125,14 @@ class SessionService implements ISessionServiceImpl{
                 whereCondition ? updateOperationEdges.push(edge) : createOperationEdges.push(edge)
             }
         }
-        await this.deleteEntity<Edge>(this.sessionVertexRepository, deleteOperationEdges, manager)
-        await this.createOrUpdateEntity<Edge>(
+        promises.push(this.deleteEntity<Edge>(this.sessionVertexRepository, deleteOperationEdges, manager))
+        promises.push(this.createOrUpdateEntity<Edge>(
             this.sessionEdgeRepository,
             createOperationEdges,
             updateOperationEdges,
             manager,
             sessionId
-        )
+        ))
     }
 
     //PUBLIC
@@ -217,12 +215,14 @@ class SessionService implements ISessionServiceImpl{
             if(!session) throw new NotFoundError("Session doesnt exist")
             const vertices = sessionUpdate.vertices
             const edges = sessionUpdate.edges
+            const promises: Promise<void>[] = []
             if(vertices){
-                await this.updateVertices(vertices, manager, sessionId)
+                promises.push(this.updateVertices(vertices, manager, sessionId))
             }
             if(edges){
-                await this. updateEdges(edges, manager, sessionId)
+                promises.push(this.updateEdges(edges, manager, sessionId))
             }
+            await Promise.all(promises)
             let imagePath: string | undefined;
             const imageBase64 = sessionUpdate.imageBase64
             let filename: string
