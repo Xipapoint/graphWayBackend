@@ -25,10 +25,9 @@ class AuthService implements IAuthServiceImpl{
     private async secureRegisterData(RegisterData: IRegiterUserRequestDto): Promise<ISecureRegisterResponseDTO>{
         const hashedPassword: string = await Security.hash(RegisterData.password);
         const email: string = RegisterData.email;
-        const age: number = RegisterData.age;
         const username: string = RegisterData.username;
 
-        return { hashedPassword, age, username, email }
+        return { hashedPassword, username, email }
     }
 
 
@@ -44,7 +43,7 @@ class AuthService implements IAuthServiceImpl{
 
         await this.userRepository.save(user)
         const rememberMe: boolean = true;
-        const tokens: IJwtUserResponseDto = this.tokenService.generateTokens(user.id, user.age, rememberMe);
+        const tokens: IJwtUserResponseDto = this.tokenService.generateTokens(user.id, rememberMe);
         return tokens
     }
 
@@ -63,7 +62,7 @@ class AuthService implements IAuthServiceImpl{
         if (!isPassEquals) {
             throw Error('Неверный пароль');
         }
-        const tokens: IJwtUserResponseDto = this.tokenService.generateTokens(existingUser.id, existingUser.age, LoginData.rememberMe);
+        const tokens: IJwtUserResponseDto = this.tokenService.generateTokens(existingUser.id, LoginData.rememberMe);
         await this.tokenService.saveToken(existingUser.id, tokens.refreshToken);
         return tokens;
     }
@@ -87,7 +86,7 @@ class AuthService implements IAuthServiceImpl{
         }
         const id = user.id
 
-        const tokens = this.tokenService.generateTokens(id, user.age, true);
+        const tokens = this.tokenService.generateTokens(id, true);
 
         await tokenService.saveToken(id, tokens.refreshToken);
         return { ...tokens };

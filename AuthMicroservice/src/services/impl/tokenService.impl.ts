@@ -4,7 +4,7 @@ import { IJwtUserResponseDto } from "../../dto/response/JwtUserResponseDTO.dto";
 import { Token } from "../../entities/Tokens";
 
 export interface ITokenServiceImpl{
-    generateTokens(userId: string, userAge: number, rememberMe: boolean) : IJwtUserResponseDto
+    generateTokens(userId: string, rememberMe: boolean) : IJwtUserResponseDto
     saveToken(userId: string, refreshToken: string): Promise<Token>
     verifyAccessToken(token: string): Promise<JwtPayload | null>
 }
