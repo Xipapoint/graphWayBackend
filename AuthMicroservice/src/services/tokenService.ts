@@ -14,8 +14,8 @@ class tokenService implements ITokenServiceImpl{
         this.tokenRepository = tokenRepository
         this.jwt = jwt;
     }
-    public generateTokens(userId: string, userAge: number, rememberMe: boolean) : IJwtUserResponseDto {
-        const payload = {userId, userAge}
+    public generateTokens(userId: string, rememberMe: boolean) : IJwtUserResponseDto {
+        const payload = {userId}
         const refreshTokenExpiry = rememberMe ? '30d' : '7d';
         const accessToken = this.jwt.sign(
             payload,

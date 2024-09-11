@@ -19,9 +19,6 @@ export class User {
   @Column({ default: 'USER' })
   role: string;
 
-  @Column()
-  age: number;
-
   @Column({ nullable: true })
   avatar: string;
 

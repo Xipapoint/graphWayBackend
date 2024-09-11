@@ -14,7 +14,11 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AlghorithmsMicroserviceCSHARP")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
+<<<<<<< HEAD
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bb7e05ca97463fbabf0a4922acd5cfc2c60ba456")]
+=======
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+45dae3b8165711c736edcec3f4cab2b1ab9e512a")]
+>>>>>>> fix/clearAgeColumnUser
 [assembly: System.Reflection.AssemblyProductAttribute("AlghorithmsMicroserviceCSHARP")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AlghorithmsMicroserviceCSHARP")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
