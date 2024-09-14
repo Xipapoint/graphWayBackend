@@ -2,7 +2,7 @@ using System;
 using AlghorithmsMicroserviceCSHARP.Service.Structure.GraphStructure;
 namespace AlghorithmsMicroserviceCSHARP.Service.Alghorithm;
 
-public class DijkstraAlgorithm
+public class DijkstraAlgorithm : IGraphAlghorithm
 {
     public void Execute(Graph graph)
     {

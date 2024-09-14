@@ -6,102 +6,124 @@ namespace AlghorithmsMicroserviceCSHARP.Service.Structure.GraphStructure;
 
 public class Graph
 {
-    public List<int> vertices;
-    public Dictionary<int, List<Tuple<int, double>>> connections;
-    public Dictionary<int, Tuple<double, int>> pair;
+    private List<int> _vertices;
+    private Dictionary<int, List<Tuple<int, double>>> _connections;
+    private Dictionary<int, Tuple<double, int>> _pair;
 
 
     public Graph()
     {
-        vertices = new List<int>();
-        connections = new Dictionary<int, List<Tuple<int, double>>>();
-        pair = new Dictionary<int, Tuple<double, int>>();
+        _vertices = new List<int>();
+        _connections = new Dictionary<int, List<Tuple<int, double>>>();
+        _pair = new Dictionary<int, Tuple<double, int>>();
     }
 
     public void AddVertex(int vertex)
     {
-        if (!vertices.Contains(vertex))
+        if (!_vertices.Contains(vertex))
         {
-            vertices.Add(vertex);
+            _vertices.Add(vertex);
         }
     }
 
     public void AddUndirectedEdge(int vertex1, int vertex2, double weight)
     {
-        if (!connections.ContainsKey(vertex1))
+        if (!_connections.ContainsKey(vertex1))
         {
-            connections[vertex1] = new List<Tuple<int, double>>();
+            _connections[vertex1] = new List<Tuple<int, double>>();
         }
-        if (!connections.ContainsKey(vertex2))
+
+        if (!_connections.ContainsKey(vertex2))
         {
-            connections[vertex2] = new List<Tuple<int, double>>();
+            _connections[vertex2] = new List<Tuple<int, double>>();
         }
-        connections[vertex1].Add(new Tuple<int, double>(vertex2, weight));
-        connections[vertex2].Add(new Tuple<int, double>(vertex1, weight));
+
+        _connections[vertex1].Add(new Tuple<int, double>(vertex2, weight));
+        _connections[vertex2].Add(new Tuple<int, double>(vertex1, weight));
     }
 
     public void AddDirectedEdge(int startVertex, int endVertex, double weight)
     {
-        if (!connections.ContainsKey(startVertex))
+        if (!_connections.ContainsKey(startVertex))
         {
-            connections[startVertex] = new List<Tuple<int, double>>();
+            _connections[startVertex] = new List<Tuple<int, double>>();
         }
-        connections[startVertex].Add(new Tuple<int, double>(endVertex, weight));
+
+        _connections[startVertex].Add(new Tuple<int, double>(endVertex, weight));
     }
 
     public void AddPair(int parentVertex, double weight, int startVertex)
     {
-        pair[parentVertex] = new Tuple<double, int>(weight, startVertex);
+        _pair[parentVertex] = new Tuple<double, int>(weight, startVertex);
     }
 
     public List<Tuple<int, double>> GetConnectionsByKey(int key)
     {
-        if (connections.ContainsKey(key))
+        if (_connections.ContainsKey(key))
         {
-            return connections[key];
+            return _connections[key];
         }
+
         return null;
     }
 
     public void UpdateUndirectedConnectionWeight(int vertex1, int vertex2, double weight)
     {
-        for(int i = 0; i < connections[vertex1].Count(); i++)
+        for (int i = 0; i < _connections[vertex1].Count(); i++)
         {
-            if (connections[vertex1][i].Item1 == vertex2)
+            if (_connections[vertex1][i].Item1 == vertex2)
             {
-                connections[vertex1][i] = new Tuple<int, double>(vertex2, weight);
+                _connections[vertex1][i] = new Tuple<int, double>(vertex2, weight);
                 break;
             }
         }
 
-        for (int i = 0; i < connections[vertex2].Count(); i++)
+        for (int i = 0; i < _connections[vertex2].Count(); i++)
         {
 
-            if (connections[vertex2][i] != null)
+            if (_connections[vertex2][i] != null)
             {
-                if (connections[vertex2][i].Item1 == vertex1)
+                if (_connections[vertex2][i].Item1 == vertex1)
                 {
-                    connections[vertex2][i] = new Tuple<int, double>(vertex1, weight);
+                    _connections[vertex2][i] = new Tuple<int, double>(vertex1, weight);
                     break;
                 }
             }
         }
     }
+
     public void UpdateDirectedConnectionWeight(int startVeretx, int endVertex, double weight)
     {
-        for(int i = 0; i < connections[startVeretx].Count(); i++)
+        for (int i = 0; i < _connections[startVeretx].Count(); i++)
         {
-            if (connections[startVeretx][i].Item1 == endVertex)
+            if (_connections[startVeretx][i].Item1 == endVertex)
             {
-                connections[startVeretx][i] = new Tuple<int, double>(endVertex, weight);
+                _connections[startVeretx][i] = new Tuple<int, double>(endVertex, weight);
                 break;
             }
-        }   
+        }
     }
+
     public void Clear()
     {
-        vertices.Clear();
-        connections.Clear();
-        pair.Clear();
+        _vertices.Clear();
+        _connections.Clear();
+        _pair.Clear();
     }
+
+    public List<int> GetVertices()
+    {
+        return _vertices;
+    }
+
+    public Dictionary<int, List<Tuple<int, double>>> GetConnections()
+    {
+        return _connections;
+    }
+
+    public Dictionary<int, Tuple<double, int>> GetPairs()
+    {
+        return _pair;
+    }
+
 }
