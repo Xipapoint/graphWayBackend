@@ -4,6 +4,7 @@ import cors from 'cors'
 const app: Application = express();
 import dotenv from "dotenv";
 import { AppDataSource } from './dataSource';
+import { router } from './router';
 const allowedOrigins = ['http://localhost:5173'];
 
 app.use(helmet());
@@ -26,7 +27,7 @@ app.use(
     extended: true,
   })
 );
-// app.use('/api', router)
+app.use('/api', router)
 
 const PORT = process.env.PORT as number | undefined
 
