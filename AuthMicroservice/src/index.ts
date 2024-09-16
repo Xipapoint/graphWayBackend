@@ -5,6 +5,7 @@ const app: Application = express();
 import dotenv from "dotenv";
 import { AppDataSource } from './dataSource';
 import { router } from './router';
+import cookieParser from 'cookie-parser';
 const allowedOrigins = ['http://localhost:5173'];
 
 app.use(helmet());
@@ -18,9 +19,10 @@ const corsOptions = {
     },
     credentials: true, // This is important to allow cookies and other credentials
 };
-
+app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(express.json());
+
 dotenv.config({ path: __dirname+'/.env' });
 app.use(
   express.urlencoded({

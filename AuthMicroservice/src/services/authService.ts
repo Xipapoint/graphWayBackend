@@ -59,6 +59,8 @@ class AuthService implements IAuthServiceImpl{
         }
         const password: string = LoginData.password;
         const isPassEquals: boolean = await bcrypt.compare(password, existingUser.hashedPassword);
+        console.log("is pass equals:", isPassEquals);
+        
         if (!isPassEquals) {
             throw Error('Неверный пароль');
         }
@@ -67,6 +69,12 @@ class AuthService implements IAuthServiceImpl{
         
         await this.tokenService.saveToken(existingUser.id, tokens.refreshToken);
         return tokens;
+    }
+
+    async logout(refreshToken: string){
+        console.log("logging out");
+        
+        await this.tokenService.removeToken(refreshToken)
     }
 
     async refresh(refreshToken: string) {

@@ -7,4 +7,5 @@ export interface ITokenServiceImpl{
     generateTokens(userId: string) : Promise<IJwtUserResponseDto>
     saveToken(userId: string, refreshToken: string): Promise<Token>
     verifyAccessToken(token: string): Promise<JwtPayload | null>
+    removeToken(refreshToken: string): Promise<void>
 }

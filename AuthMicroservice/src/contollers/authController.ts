@@ -28,8 +28,8 @@ class AuthController{
             const userData: ILoginUserRequestDto = req.body;
             const tokens_id: IJwtUserResponseDto = await authService.login(userData)
             console.log("in controller: ", tokens_id);
-            
             res.cookie('refreshToken', tokens_id.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true, secure: true });
+            res.json(tokens_id)
         } catch (error) {
             next(error)
         }
@@ -37,10 +37,26 @@ class AuthController{
 
     async refresh(req: Request, res: Response, next: NextFunction) {
         try {
+            
             const {refreshToken} = req.cookies;
             const userData = await authService.refresh(refreshToken);
             res.cookie('refreshToken', userData.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true})
             return res.json(userData);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async logout(req: Request, res: Response, next: NextFunction) {
+        try {
+            console.log(req.cookies);
+            
+            const {refreshToken} = req.cookies;
+            console.log(refreshToken);
+            
+            await authService.logout(refreshToken);
+            res.clearCookie('refreshToken');
+            return res.status(200).send({ message: 'Logout successful' });
         } catch (e) {
             next(e);
         }

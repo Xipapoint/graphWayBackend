@@ -28,7 +28,8 @@ class tokenService implements ITokenServiceImpl{
             { expiresIn: refreshTokenExpiry }
         );
         const existingToken = await this.tokenRepository.findOne({ where: { userId } });
-
+        console.log("is token existing:", existingToken);
+        
         if (existingToken) {
             existingToken.refreshToken = refreshToken;
             await this.tokenRepository.save(existingToken);
@@ -68,9 +69,16 @@ class tokenService implements ITokenServiceImpl{
         return jwt.verify(token, process.env.JWT_REFRESH_SECRET as string) as JwtPayload;
     }
 
-    async findToken(refreshToken: string) {
+    public async findToken(refreshToken: string) {
         return await this.tokenRepository.findOneBy({refreshToken})
     }
+
+    public async removeToken(refreshToken: string){
+        await this.tokenRepository.delete({refreshToken})
+        console.log("deleting");
+        
+    }
+
 }
 
 export default new tokenService(AppDataSource.getRepository(Token));
