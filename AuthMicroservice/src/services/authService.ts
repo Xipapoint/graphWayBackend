@@ -42,16 +42,16 @@ class AuthService implements IAuthServiceImpl{
         const user: User = this.userRepository.create({...secureData})
 
         await this.userRepository.save(user)
-        const rememberMe: boolean = true;
-        const tokens: IJwtUserResponseDto = this.tokenService.generateTokens(user.id, rememberMe);
+        const tokens: IJwtUserResponseDto = await this.tokenService.generateTokens(user.id);
         return tokens
     }
 
     async login(LoginData: ILoginUserRequestDto): Promise<IJwtUserResponseDto> {
+        console.log(LoginData);
+        
         const existingUser: User | null = await this.userRepository.findOne({
             where: [
               { email: LoginData.email },
-              { username: LoginData.username }
             ]
           });
         if(existingUser === null){
@@ -62,7 +62,9 @@ class AuthService implements IAuthServiceImpl{
         if (!isPassEquals) {
             throw Error('Неверный пароль');
         }
-        const tokens: IJwtUserResponseDto = this.tokenService.generateTokens(existingUser.id, LoginData.rememberMe);
+        const tokens: IJwtUserResponseDto = await this.tokenService.generateTokens(existingUser.id);
+        console.log(tokens);
+        
         await this.tokenService.saveToken(existingUser.id, tokens.refreshToken);
         return tokens;
     }
@@ -86,7 +88,7 @@ class AuthService implements IAuthServiceImpl{
         }
         const id = user.id
 
-        const tokens = this.tokenService.generateTokens(id, true);
+        const tokens = await this.tokenService.generateTokens(id);
 
         await tokenService.saveToken(id, tokens.refreshToken);
         return { ...tokens };

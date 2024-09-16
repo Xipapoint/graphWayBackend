@@ -14,9 +14,9 @@ class tokenService implements ITokenServiceImpl{
         this.tokenRepository = tokenRepository
         this.jwt = jwt;
     }
-    public generateTokens(userId: string, rememberMe: boolean) : IJwtUserResponseDto {
+    public async generateTokens(userId: string) : Promise<IJwtUserResponseDto> {
         const payload = {userId}
-        const refreshTokenExpiry = rememberMe ? '30d' : '7d';
+        const refreshTokenExpiry = '7d';
         const accessToken = this.jwt.sign(
             payload,
             process.env.JWT_ACCESS_SECRET as string,
@@ -27,9 +27,15 @@ class tokenService implements ITokenServiceImpl{
             process.env.JWT_REFRESH_SECRET as string,
             { expiresIn: refreshTokenExpiry }
         );
-        const refreshTokenEntity: Token = this.tokenRepository.create({userId, refreshToken})
-        this.tokenRepository.save(refreshTokenEntity)
+        const existingToken = await this.tokenRepository.findOne({ where: { userId } });
 
+        if (existingToken) {
+            existingToken.refreshToken = refreshToken;
+            await this.tokenRepository.save(existingToken);
+        } else {
+            const refreshTokenEntity: Token = this.tokenRepository.create({ userId, refreshToken });
+            await this.tokenRepository.save(refreshTokenEntity);
+        }
         return {
             accessToken,
             refreshToken,

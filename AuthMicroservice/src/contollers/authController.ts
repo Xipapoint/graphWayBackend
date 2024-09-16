@@ -27,6 +27,8 @@ class AuthController{
         try {
             const userData: ILoginUserRequestDto = req.body;
             const tokens_id: IJwtUserResponseDto = await authService.login(userData)
+            console.log("in controller: ", tokens_id);
+            
             res.cookie('refreshToken', tokens_id.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true, secure: true });
         } catch (error) {
             next(error)
