@@ -51,7 +51,7 @@ class tokenService implements ITokenServiceImpl{
             tokenData.refreshToken = refreshToken;
             return tokenRepository.save(tokenData);
         }
-        const token = await tokenRepository.create({userId: userId, refreshToken})
+        const token = tokenRepository.create({userId: userId, refreshToken})
         return token;
     }
 

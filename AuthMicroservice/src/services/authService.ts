@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { Not, Repository } from "typeorm";
 import { User } from "../entities/User";
 import { IAuthServiceImpl } from "./impl/authServiceImpl";
 import { ILoginUserRequestDto } from "../dto/request/LoginUserRequestDTO.dto";
@@ -11,6 +11,10 @@ import { Security } from "../utils/security";
 import bcrypt from 'bcrypt';
 import tokenService from "./tokenService";
 import { AppDataSource } from "../dataSource";
+import NotFoundError from "../error/4__Error/NotFoundError.error";
+import { ValidationError } from "../error/4__Error/ValidationError.error";
+import { UnauthorizedError } from "../error/4__Error/UnauthorizedError.error";
+import { ConflictError } from "../error/4__Error/ConflictError.error";
 
 
 class AuthService implements IAuthServiceImpl{
@@ -36,7 +40,7 @@ class AuthService implements IAuthServiceImpl{
    async registrationService(RegisterData: IRegiterUserRequestDto) : Promise<IJwtUserResponseDto> {
         const existingUser = await this.userRepository.findOne({ where: { email: RegisterData.email } });
         if(existingUser){
-            throw new Error("User already exists");
+            throw new ConflictError("User already exists");
         }
         const secureData: ISecureRegisterResponseDTO = await this.secureRegisterData(RegisterData);
         const user: User = this.userRepository.create({...secureData})
@@ -55,14 +59,14 @@ class AuthService implements IAuthServiceImpl{
             ]
           });
         if(existingUser === null){
-            throw new Error("User doesnt exist");
+            throw new NotFoundError("User doesnt exist");
         }
         const password: string = LoginData.password;
         const isPassEquals: boolean = await bcrypt.compare(password, existingUser.hashedPassword);
         console.log("is pass equals:", isPassEquals);
         
         if (!isPassEquals) {
-            throw Error('Неверный пароль');
+            throw new ValidationError('Неверный пароль');
         }
         const tokens: IJwtUserResponseDto = await this.tokenService.generateTokens(existingUser.id);
         console.log(tokens);
@@ -79,7 +83,7 @@ class AuthService implements IAuthServiceImpl{
 
     async refresh(refreshToken: string) {
         if (!refreshToken) {
-            throw new Error("Unathorized");
+            throw new UnauthorizedError("Unathorized");
         }
         console.log("entered refresh service");
         
@@ -87,12 +91,12 @@ class AuthService implements IAuthServiceImpl{
         const tokenFromDb = await tokenService.findToken(refreshToken);
 
         if (!userData || !tokenFromDb) {
-            throw new Error("Unathorized");;
+            throw new UnauthorizedError("Unathorized");;
         }
 
         const user = await this.userRepository.findOne({where: userData.id});
         if (!user) {
-            throw new Error("Unathorized");;
+            throw new NotFoundError("User doesnt exist");;
         }
         const id = user.id
 
