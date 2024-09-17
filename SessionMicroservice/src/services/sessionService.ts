@@ -90,6 +90,7 @@ class SessionService implements ISessionServiceImpl{
         const creatOperationVertices: IVertex<Vertex>[] = []
         const updateOperationVertices: IVertex<Vertex>[] = []
         const deleteOperationVertices: number[] = []
+        const promises: Promise<void>[] = []
         for (const updateVertex of updateVertices) {
             const updateType = updateVertex.updateType
             if (updateType === 'delete') {
@@ -100,14 +101,15 @@ class SessionService implements ISessionServiceImpl{
                 whereCondition ? updateOperationVertices.push(vertex) : creatOperationVertices.push(vertex)
             }
         }
-        await this.deleteEntity<Vertex>(this.sessionVertexRepository, deleteOperationVertices, manager)
-        await this.createOrUpdateEntity<Vertex>(
+        promises.push(this.deleteEntity<Vertex>(this.sessionVertexRepository, deleteOperationVertices, manager))
+        promises.push(this.createOrUpdateEntity<Vertex>(
             this.sessionVertexRepository,
             creatOperationVertices,
             updateOperationVertices,
             manager,
             sessionId
-        )
+        ))
+        await Promise.all(promises)
     }
 
     private async updateEdges(updateEdges: IUpdateOrDeleteSessionEdgeRequestDTO[], manager: EntityManager, sessionId: string) {
@@ -133,6 +135,7 @@ class SessionService implements ISessionServiceImpl{
             manager,
             sessionId
         ))
+        await Promise.all(promises)
     }
 
     //PUBLIC

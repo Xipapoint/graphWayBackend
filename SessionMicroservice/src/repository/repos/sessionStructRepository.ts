@@ -10,7 +10,7 @@ class SessionStructService extends BaseRepository<SessionStructures> implements 
     constructor(
         sessionStructRepository: Repository<SessionStructures> 
     ){
-        super()
+        super(SessionStructures)
         this.sessionStructRepository = sessionStructRepository
 
     }
