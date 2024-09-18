@@ -4,6 +4,9 @@ import { BaseSessionTypesEntity } from "../base/BaseSessionTypesEntity";
 @Entity('alghorithms')
 export class Alghorithm extends BaseSessionTypesEntity{
 
+    @Column()
+    isDirected: boolean;
+
     @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
     createdAt: Date;
   

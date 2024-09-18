@@ -4,7 +4,11 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "typeorm:migrate": " npx typeorm-ts-node-commonjs migration:run -d src/dataSource.ts     ",
+    "typeorm:revert": " npx typeorm-ts-node-commonjs migration:revert -d src/dataSource.ts     ",
+    "typeorm:drop": "npx typeorm-ts-node-esm schema:drop -d src/db/dataSourceLocal.ts",
+    "migration:create": "npx typeorm migration:create ./src/migrations/"
   },
   "keywords": [],
   "author": "",
