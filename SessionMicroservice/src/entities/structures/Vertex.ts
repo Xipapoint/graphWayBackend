@@ -16,9 +16,6 @@ export class Vertex extends BaseStructureEntity {
   @Column({ type: 'simple-array', nullable: true })
   pair?: number[];
 
-  @Column({ default: false })
-  isShortest: boolean;
-
   @ManyToOne(() => Session, session => session, {nullable: true})
   session?: Session;
 

@@ -1,9 +1,12 @@
 import { BaseEntity } from "../BaseEntity";
-import { Column, PrimaryColumn } from 'typeorm';
+import { Column, PrimaryGeneratedColumn } from 'typeorm';
 
 export class BaseStructureEntity extends BaseEntity{
-    @PrimaryColumn('number')
+    @PrimaryGeneratedColumn('increment')
     id: number
+
+    @Column()
+    index: number
 
     @Column()
     isShortest: boolean
