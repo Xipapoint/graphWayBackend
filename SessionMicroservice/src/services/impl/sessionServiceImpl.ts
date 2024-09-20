@@ -1,6 +1,6 @@
 import { Session } from "../../entities/Session";
 
-import { ICreateSessionRequestDTO } from "../../dto/request/CreateSessionRequestDTO";
+import { ICreateSessionRequestDTO } from "../../dto/request/createSession/CreateGraphSessionRequestDTO";
 import { ICreateSessionResponseDTO } from "../../dto/response/session/CreateSessionResponseDTO";
 import { IGetAlgosResponseDTO } from "../../dto/response/session/GetAlgosResponseDTO";
 import { IGetSessionTypesResponseDTO } from "../../dto/response/session/GetSessionTypesResponseDTO";

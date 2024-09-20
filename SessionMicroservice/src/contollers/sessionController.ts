@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { ICreateSessionRequestDTO } from "../dto/request/CreateSessionRequestDTO";
+import { ICreateSessionRequestDTO } from "../dto/request/createSession/CreateGraphSessionRequestDTO";
 import { IUpdateSessionRequestDTO } from "../dto/request/updateSession/UpdateSessionRequestDTO";
 import { ISessionServiceImpl } from "../services/impl/sessionServiceImpl";
 import sessionService from "../services/sessionService";

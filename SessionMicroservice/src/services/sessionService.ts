@@ -1,7 +1,7 @@
 import { EntityManager, ObjectLiteral, Repository } from 'typeorm';
 import { Session } from '../entities/Session';
 import { ISessionServiceImpl } from "./impl/sessionServiceImpl";
-import { ICreateSessionRequestDTO } from "../dto/request/CreateSessionRequestDTO";
+import { ICreateSessionRequestDTO } from "../dto/request/createSession/CreateGraphSessionRequestDTO";
 import { CheckUserExistsRequestMessage } from "../rabbitMQ/types/request/requestTypes";
 import producer from "../rabbitMQ/producer";
 import { CheckUserExistsResponse } from "../rabbitMQ/types/response/responseTypes";
@@ -32,23 +32,24 @@ import edgeRepository from "../repository/repos/edgeRepository";
 import { IVertex } from "../dto/request/updateSession/interfaces/structures/vertex";
 import { IEdge } from "../dto/request/updateSession/interfaces/structures/edge";
 import { IBaseCreateOrUpdateRequestDTO } from '../dto/request/updateSession/BaseCreateOrUpdateRequestDTO';
+import { IGraphSessionRepositoryImpl } from '../repository/impl/repos/graphSessionRepositoryImpl';
 
 class SessionService implements ISessionServiceImpl{
-    private sessionRepository: Repository<Session>
+    private sessionGraphRepository: IGraphSessionRepositoryImpl
     private sessionStructRepository: ISessionStructRepositoryImpl
     private sessionTypeRepository: ISessionTypeRepositoryImpl
     private sessionAlghorithmRepository: ISessionAlghoRepositoryImpl
     private sessionVertexRepository: IVertexRepositoryImpl
     private sessionEdgeRepository:  IEdgeRepositoryImpl;
     constructor(
-        sessionRepository: Repository<Session>, 
+        sessionGraphRepository: IGraphSessionRepositoryImpl, 
         sessionStructRepository: ISessionStructRepositoryImpl,
         sessionTypeRepository: ISessionTypeRepositoryImpl, 
         sessionAlghorithmRepository: ISessionAlghoRepositoryImpl,
         sessionVertexRepository: IVertexRepositoryImpl,
         sessionEdgeRepository: IEdgeRepositoryImpl
     ){
-        this.sessionRepository = sessionRepository
+        this.sessionGraphRepository = sessionGraphRepository
         this.sessionStructRepository = sessionStructRepository
         this.sessionTypeRepository = sessionTypeRepository
         this.sessionAlghorithmRepository = sessionAlghorithmRepository
@@ -76,7 +77,7 @@ class SessionService implements ISessionServiceImpl{
         manager: EntityManager,
         sessionId: string
     ): Promise<void> {
-        const session = await this.sessionRepository.findOne({where: {id: sessionId}})
+        const session = await this.sessionRepository({where: {id: sessionId}})
         createData.length !== 0 ? repository.batchCreateEntity(createData, manager, session!) : null
         updateData.length !== 0
             ? updateData.forEach(data => {

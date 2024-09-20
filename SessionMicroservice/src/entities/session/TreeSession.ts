@@ -4,7 +4,7 @@ import { Vertex } from "../structures/Vertex";
 import { SessionStructures } from "../types/SessionStructures";
 
 @Entity('tree-sessions')
-export class GraphSessions extends BaseSessionEntity{
+export class TreeSessions extends BaseSessionEntity{
 
     @OneToMany( () => Vertex, vertex => vertex.id, {nullable: true})
     vertices?: Vertex[];
