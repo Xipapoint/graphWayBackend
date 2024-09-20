@@ -14,7 +14,7 @@ import { SessionTypes } from './types/SessionTypes';
 import { SessionStructures } from './types/SessionStructures';
 import { Alghorithm } from './types/Alghorithm';
   
-  @Entity('sessions')
+ @Entity('sessions')
   export class Session extends BaseEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
@@ -33,9 +33,6 @@ import { Alghorithm } from './types/Alghorithm';
 
     @OneToMany( () => Vertex, vertex => vertex.id, {nullable: true})
     vertices?: Vertex[];
-  
-    @OneToMany(() => Edge, edge => edge.session, {nullable: true})
-    edges?: Edge[];
   
     @Column()
     userId: string
@@ -57,4 +54,4 @@ import { Alghorithm } from './types/Alghorithm';
       this.sessionName = Security.generateRandomString()
     }
 
-  }
+  } 

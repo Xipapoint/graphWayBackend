@@ -6,17 +6,14 @@ import { Entity, PrimaryColumn, Column, ManyToOne } from "typeorm";
 @Entity('edges')
 export class Edge extends BaseStructureEntity {
 
-  @Column({ nullable: true })
-  left?: number;
+  @Column()
+  left: number;
 
-  @Column({ nullable: true })
-  top?: number;
+  @Column()
+  top: number;
 
-  @Column({ nullable: true })
-  weight?: number;
-
-  @Column({ nullable: true })
-  angle?: number;
+  @Column()
+  angle: number;
 
   @Column()
   startVertex: number;
@@ -24,8 +21,7 @@ export class Edge extends BaseStructureEntity {
   @Column()
   endVertex: number;
 
-  @ManyToOne(() => Session, session => session.edges, {nullable: true})
-  session?: Session;
+  sessionId: string
 
   @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;

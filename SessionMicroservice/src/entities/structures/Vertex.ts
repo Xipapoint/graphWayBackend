@@ -7,17 +7,16 @@ import { BaseStructureEntity } from "../base/BaseStructureEntity";
 @Entity('vertices')
 export class Vertex extends BaseStructureEntity {
 
-  @Column({nullable: true})
-  xCord?: number;
+  @Column()
+  xCord: number;
 
-  @Column({nullable: true})
-  yCord?: number;
+  @Column()
+  yCord: number;
 
   @Column({ type: 'simple-array', nullable: true })
   pair?: number[];
 
-  @ManyToOne(() => Session, session => session, {nullable: true})
-  session?: Session;
+  sessionId: string
 
   @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;

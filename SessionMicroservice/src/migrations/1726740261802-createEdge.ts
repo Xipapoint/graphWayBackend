@@ -19,7 +19,8 @@ export class CreateEdge1726740261802 implements MigrationInterface {
                 },
                 {
                     name: 'left',
-                    type: 'id'
+                    type: 'id',
+                    isNullable: true
                 }
             ]
         }))
