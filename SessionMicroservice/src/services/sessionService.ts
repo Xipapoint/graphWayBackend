@@ -1,18 +1,17 @@
-import { EntityManager, ObjectLiteral, Repository } from 'typeorm';
+import { EntityManager, ObjectLiteral } from 'typeorm';
 import { Session } from '../entities/Session';
 import { ISessionServiceImpl } from "./impl/sessionServiceImpl";
 import { ICreateSessionRequestDTO } from "../dto/request/createSession/CreateGraphSessionRequestDTO";
 import { CheckUserExistsRequestMessage } from "../rabbitMQ/types/request/requestTypes";
 import producer from "../rabbitMQ/producer";
 import { CheckUserExistsResponse } from "../rabbitMQ/types/response/responseTypes";
-import { ICreateSessionResponseDTO } from "../dto/response/session/CreateSessionResponseDTO";
+import { ICreateGraphSessionResponseDTO } from "../dto/response/session/CreateGraphSessionResponseDTO";
 import NotFoundError from "../error/4__Error/NotFoundError.error";
 import { IGetSessionStructuresResponseDTO } from "../dto/response/session/GetSessionStructuresResponseDTO";
 import { IGetAlgosResponseDTO } from "../dto/response/session/GetAlgosResponseDTO";
 import { IGetSessionTypesResponseDTO } from "../dto/response/session/GetSessionTypesResponseDTO";
 import { IUpdateSessionRequestDTO } from "../dto/request/updateSession/UpdateSessionRequestDTO";
 import { Vertex } from "../entities/structures/base/Vertex";
-import { Edge } from "../entities/structures/EdgeWithCoords";
 import { ISessionStructRepositoryImpl } from "../repository/impl/repos/sessionStructRepositoryImpl";
 import { ISessionTypeRepositoryImpl } from "../repository/impl/repos/sessionTypeRepositoryImpl";
 import { ISessionAlghoRepositoryImpl } from '../repository/impl/repos/sessionAlghoRepositoryImpl';
@@ -147,18 +146,23 @@ class SessionService implements ISessionServiceImpl{
             const existingSessionStructure = await this.sessionStructRepository.findSessionStructure(sessionStructId);
             const existingAlghorithm = await this.sessionAlghorithmRepository.findSessionAlghorithm(alghorithmId);
             await this.verifyUserExists(userId);
-            const session: Session = this.sessionRepository.create(
-            {
-                sessionType: existingSessionType, 
-                structType: existingSessionStructure, 
-                alghorithm: existingAlghorithm,
-                userId: userId,
-            })
-            await this.sessionRepository.save(session)
-            const response: ICreateSessionResponseDTO = {
+            let session;
+            if(existingSessionType.name === 'Graph') {
+                session = this.sessionGraphRepository.create({
+                    userId,
+                    alghorithm: existingAlghorithm
+                })
+            } else {
+                session = this.sessionGraphRepository.create({
+                    userId,
+                    alghorithm: existingAlghorithm
+                })
+            }
+            const response: ICreateGraphSessionResponseDTO = {
                 id: session.id, 
-                sessionType: session.sessionType.name,
-                sessionStruct: session.structType.name
+                name: session.sessionName,
+                sessionType: existingSessionType.name,
+                sessionStruct:existingSessionStructure.name,
             }
             return response
         } catch(error){

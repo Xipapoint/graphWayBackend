@@ -14,7 +14,7 @@ class GraphSessionRepository extends BaseRepository<GraphSessions> implements IG
     }
 
     create(data: ICreateGraphSessionFieldsDTO): GraphSessions{
-        return this.graphSessionRepository.create(data)
+        return this.graphSessionRepository.create({userId: data.userId, alghorithm: data.alghorithm})
     }
 
     async findGraphSession(graphSessionId: string): Promise<GraphSessions>{

@@ -1,5 +1,5 @@
 import { BaseEntity, BeforeInsert, Column, PrimaryGeneratedColumn } from "typeorm";
-import { SessionTypes } from "../types/Type";
+import { Type } from "../types/Type";
 import { Security } from "../../utils/security";
 
  export class BaseSessionEntity extends BaseEntity{
@@ -14,9 +14,6 @@ import { Security } from "../../utils/security";
 
     @Column()
     userId: string
-
-    @Column()
-    sessionType: SessionTypes
 
     @BeforeInsert()
     setSessionName(){

@@ -1,28 +1,28 @@
 import { FindManyOptions, Repository } from "typeorm";
-import { SessionTypes } from "../../entities/types/Type";
+import { Type } from "../../entities/types/Type";
 import NotFoundError from "../../error/4__Error/NotFoundError.error";
 import { AppDataSource } from "../../dataSource";
 import { ISessionTypeRepositoryImpl } from "../impl/repos/sessionTypeRepositoryImpl";
 import { sessionRouter } from '../../router/sessionRouter';
 import { BaseRepository } from "../baseRepository";
 
-class SessionTypeRepository extends BaseRepository<SessionTypes> implements ISessionTypeRepositoryImpl{
-    private sessionTypeRepository: Repository<SessionTypes>
+class SessionTypeRepository extends BaseRepository<Type> implements ISessionTypeRepositoryImpl{
+    private sessionTypeRepository: Repository<Type>
     constructor(
-        sessionTypeRepository: Repository<SessionTypes>, 
+        sessionTypeRepository: Repository<Type>, 
     ){
-        super(SessionTypes)
+        super(Type)
         this.sessionTypeRepository = sessionTypeRepository
 
     }
 
-    public async findSessionType(sessionTypeId: number): Promise<SessionTypes> {
+    public async findSessionType(sessionTypeId: number): Promise<Type> {
         const sessionType = await this.sessionTypeRepository.findOne({ where: { id: sessionTypeId } });
         if (!sessionType) throw new NotFoundError("Session type doesnt exist");
         return sessionType;
     }
 
-    public async findAll(options?: FindManyOptions<SessionTypes>): Promise<SessionTypes[]> {
+    public async findAll(options?: FindManyOptions<Type>): Promise<Type[]> {
         const alghorithms = await this.sessionTypeRepository.find(options)
         return alghorithms
     }
@@ -37,4 +37,4 @@ class SessionTypeRepository extends BaseRepository<SessionTypes> implements ISes
     }
 }
 
-export default new SessionTypeRepository(AppDataSource.getRepository(SessionTypes))
+export default new SessionTypeRepository(AppDataSource.getRepository(Type))

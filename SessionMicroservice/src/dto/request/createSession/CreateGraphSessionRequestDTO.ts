@@ -1,3 +1,4 @@
+// For controller request
 export interface ICreateSessionRequestDTO{
     sessionTypeId: number,
     sessionStructId: number,

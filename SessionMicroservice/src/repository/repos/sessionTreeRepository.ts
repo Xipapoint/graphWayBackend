@@ -12,6 +12,10 @@ class TreeSessionRepository extends BaseRepository<TreeSessions> implements ITre
         this.treeSessionRepository = treeSessionRepository
     }
 
+    create(data: ICreateGraphSessionFieldsDTO): TreeSessions{
+        return this.treeSessionRepository.create({userId: data.userId, alghorithm: data.alghorithm})
+    }
+
     async findTreeSession(treeSessionId: string): Promise<TreeSessions>{
         const sessionType = await this.treeSessionRepository.findOne({ where: { id: treeSessionId } });
         if (!sessionType) throw new NotFoundError("Session type doesnt exist");

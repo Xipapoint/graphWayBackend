@@ -1,10 +1,10 @@
 import { MigrationInterface, QueryRunner, Table, TableForeignKey } from "typeorm";
 
-export class CreateSessionTable1726651260625 implements MigrationInterface {
+export class CreateGraphSessionTable1726651260625 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.createTable(new Table({
-            name: 'sessions',
+            name: 'graph-sessions',
             columns: [
                 {
                     name: 'id',
@@ -40,12 +40,7 @@ export class CreateSessionTable1726651260625 implements MigrationInterface {
                     isNullable: false,
                 },
                 {
-                    name: 'sessionTypeId',
-                    type: 'int',
-                    isNullable: false,
-                },
-                {
-                    name: 'structTypeId',
+                    name: 'alghorithmId',
                     type: 'int',
                     isNullable: false,
                 },

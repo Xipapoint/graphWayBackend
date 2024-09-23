@@ -1,7 +1,7 @@
 import { Session } from "../../entities/Session";
 
 import { ICreateSessionRequestDTO } from "../../dto/request/createSession/CreateGraphSessionRequestDTO";
-import { ICreateSessionResponseDTO } from "../../dto/response/session/CreateSessionResponseDTO";
+import { ICreateSessionResponseDTO } from "../../dto/response/session/CreateGraphSessionResponseDTO";
 import { IGetAlgosResponseDTO } from "../../dto/response/session/GetAlgosResponseDTO";
 import { IGetSessionTypesResponseDTO } from "../../dto/response/session/GetSessionTypesResponseDTO";
 import { IGetSessionStructuresResponseDTO } from "../../dto/response/session/GetSessionStructuresResponseDTO";
