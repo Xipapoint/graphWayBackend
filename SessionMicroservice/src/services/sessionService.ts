@@ -11,8 +11,8 @@ import { IGetSessionStructuresResponseDTO } from "../dto/response/session/GetSes
 import { IGetAlgosResponseDTO } from "../dto/response/session/GetAlgosResponseDTO";
 import { IGetSessionTypesResponseDTO } from "../dto/response/session/GetSessionTypesResponseDTO";
 import { IUpdateSessionRequestDTO } from "../dto/request/updateSession/UpdateSessionRequestDTO";
-import { Vertex } from "../entities/structures/Vertex";
-import { Edge } from "../entities/structures/Edge";
+import { Vertex } from "../entities/structures/base/Vertex";
+import { Edge } from "../entities/structures/EdgeWithCoords";
 import { ISessionStructRepositoryImpl } from "../repository/impl/repos/sessionStructRepositoryImpl";
 import { ISessionTypeRepositoryImpl } from "../repository/impl/repos/sessionTypeRepositoryImpl";
 import { ISessionAlghoRepositoryImpl } from '../repository/impl/repos/sessionAlghoRepositoryImpl';
@@ -214,6 +214,7 @@ class SessionService implements ISessionServiceImpl{
     }
 
     async updateSession(sessionUpdate: IUpdateSessionRequestDTO): Promise<boolean> {
+        
         await this.sessionRepository.manager.transaction(async (manager: EntityManager) => {
             const sessionId = sessionUpdate.sessionId
             const session = await this.sessionRepository.findOne({where: {id: sessionId}})

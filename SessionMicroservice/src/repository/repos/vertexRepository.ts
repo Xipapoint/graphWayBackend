@@ -1,5 +1,5 @@
 import { Repository } from "typeorm";
-import { Vertex } from "../../entities/structures/Vertex";
+import { Vertex } from "../../entities/structures/base/Vertex";
 import { BaseRepository } from "../baseRepository";
 import { IVertexRepositoryImpl } from "../impl/repos/vertexRepositoryImpl";
 import { AppDataSource } from "../../dataSource";

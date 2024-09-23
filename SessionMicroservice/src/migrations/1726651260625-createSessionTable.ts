@@ -61,26 +61,6 @@ export class CreateSessionTable1726651260625 implements MigrationInterface {
                 }
             ]
         }));
-        await queryRunner.createForeignKey('sessions', new TableForeignKey({
-            columnNames: ['sessionTypeId'],
-            referencedColumnNames: ['id'],
-            referencedTableName: 'sessionTypes',
-            onDelete: 'CASCADE', 
-        }));
-
-        await queryRunner.createForeignKey('sessions', new TableForeignKey({
-            columnNames: ['sessionStructId'],
-            referencedColumnNames: ['id'],
-            referencedTableName: 'sessionStructures',
-            onDelete: 'CASCADE',
-        }));
-
-        await queryRunner.createForeignKey('sessions', new TableForeignKey({
-            columnNames: ['sessionAlghorithmId'],
-            referencedColumnNames: ['id'],
-            referencedTableName: 'alghorithms',
-            onDelete: 'CASCADE',
-        }));
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {

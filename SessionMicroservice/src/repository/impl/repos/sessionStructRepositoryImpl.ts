@@ -1,5 +1,5 @@
 import { FindManyOptions } from "typeorm";
-import { SessionStructures } from "../../../entities/types/SessionStructures";
+import { SessionStructures } from "../../../entities/types/Structures";
 import { IBaseRepositoryImpl } from "../baseRepositoryImpl";
 
 export interface ISessionStructRepositoryImpl extends IBaseRepositoryImpl<SessionStructures>{

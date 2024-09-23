@@ -1,4 +1,4 @@
-import { Vertex } from "../../../../entities/structures/Vertex";
+import { Vertex } from "../../../../entities/structures/base/Vertex";
 import { IVertex } from "../interfaces/structures/vertex";
 
 export interface IUpdateOrDeleteSessionVertexRequestDTO {

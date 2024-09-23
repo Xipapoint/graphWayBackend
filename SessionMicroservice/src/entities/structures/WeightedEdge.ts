@@ -1,9 +1,8 @@
 import { Entity, Column, ManyToOne } from "typeorm";
-import { BaseStructureEntity } from "../base/BaseStructureEntity";
-import { GraphSessions } from "../session/GraphSession";
+import { Edge } from "./base/Edge";
 
 @Entity('weighted-edges')
-export class WeightedEdge extends BaseStructureEntity{
+export class WeightedEdge extends Edge{
 
     @Column()
     left: number;
@@ -22,13 +21,5 @@ export class WeightedEdge extends BaseStructureEntity{
 
     @Column()
     weight: number;
-    
-    @Column({})
-    sessionId: string
 
-    @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
-    createdAt: Date;
-
-    @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
-    updatedAt: Date;
 }

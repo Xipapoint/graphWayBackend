@@ -1,5 +1,5 @@
 import { FindManyOptions } from "typeorm";
-import { SessionTypes } from "../../../entities/types/SessionTypes";
+import { SessionTypes } from "../../../entities/types/Type";
 import { IBaseRepositoryImpl } from "../baseRepositoryImpl";
 import { Session } from '../../../entities/Session';
 

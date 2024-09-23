@@ -1,6 +1,6 @@
 import { FindManyOptions, Repository } from "typeorm";
 import { AppDataSource } from "../../dataSource";
-import { SessionStructures } from "../../entities/types/SessionStructures";
+import { SessionStructures } from "../../entities/types/Structures";
 import NotFoundError from "../../error/4__Error/NotFoundError.error";
 import { ISessionStructRepositoryImpl } from "../impl/repos/sessionStructRepositoryImpl";
 import { BaseRepository } from "../baseRepository";

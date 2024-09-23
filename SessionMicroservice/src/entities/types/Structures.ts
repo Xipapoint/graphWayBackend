@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
-import { BaseSessionTypesEntity } from "../base/BaseSessionTypesEntity";
+import { BaseTypeEntity } from "../base/BaseTypeEntity";
 
-@Entity('sessin-structures')
-export class SessionStructures extends BaseSessionTypesEntity{
+@Entity('structures')
+export class Structure extends BaseTypeEntity{
     @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
     createdAt: Date;
   

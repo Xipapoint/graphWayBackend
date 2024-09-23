@@ -4,7 +4,7 @@ import { IBaseRepositoryImpl } from "./impl/baseRepositoryImpl";
 import { AppDataSource } from "../dataSource";
 import NotFoundError from "../error/4__Error/NotFoundError.error";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
-import { Vertex } from "../entities/structures/Vertex";
+import { Vertex } from "../entities/structures/base/Vertex";
 import { IVertex } from "../dto/request/updateSession/interfaces/structures/vertex";
 import { IBaseCreateOrUpdateRequestDTO } from "../dto/request/updateSession/BaseCreateOrUpdateRequestDTO";
 import { Session } from "../entities/Session";

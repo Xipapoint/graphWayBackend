@@ -1,8 +1,8 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { BaseSessionTypesEntity } from "../base/BaseSessionTypesEntity";
+import { BaseTypeEntity } from "../base/BaseTypeEntity";
 
 @Entity('alghorithms')
-export class Alghorithm extends BaseSessionTypesEntity{
+export class Alghorithm extends BaseTypeEntity{
 
     @Column()
     isDirected: boolean;

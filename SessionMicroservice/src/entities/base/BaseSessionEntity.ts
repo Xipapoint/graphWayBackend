@@ -1,5 +1,5 @@
 import { BaseEntity, BeforeInsert, Column, PrimaryGeneratedColumn } from "typeorm";
-import { SessionTypes } from "../types/SessionTypes";
+import { SessionTypes } from "../types/Type";
 import { Security } from "../../utils/security";
 
  export class BaseSessionEntity extends BaseEntity{

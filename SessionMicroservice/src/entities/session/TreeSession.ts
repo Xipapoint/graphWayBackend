@@ -1,19 +1,13 @@
 import { Column, Entity, OneToMany } from "typeorm";
 import { BaseSessionEntity } from "../base/BaseSessionEntity";
-import { Vertex } from "../structures/Vertex";
-import { SessionStructures } from "../types/SessionStructures";
+import { Vertex } from "../structures/base/Vertex";
+import { Structure } from "../types/Structures";
 
 @Entity('tree-sessions')
 export class TreeSessions extends BaseSessionEntity{
 
-    @OneToMany( () => Vertex, vertex => vertex.id, {nullable: true})
-    vertices?: Vertex[];
-
-    @Column({ nullable: true, type: 'simple-array' })
-    shortestVertices?: number[];
-
     @Column()
-    structType: SessionStructures;
+    structType: Structure;
 
     @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
     createdAt: Date;

@@ -1,5 +1,5 @@
 import { FindManyOptions, Repository } from "typeorm";
-import { SessionTypes } from "../../entities/types/SessionTypes";
+import { SessionTypes } from "../../entities/types/Type";
 import NotFoundError from "../../error/4__Error/NotFoundError.error";
 import { AppDataSource } from "../../dataSource";
 import { ISessionTypeRepositoryImpl } from "../impl/repos/sessionTypeRepositoryImpl";

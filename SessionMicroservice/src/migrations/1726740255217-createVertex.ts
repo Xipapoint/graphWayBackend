@@ -50,13 +50,6 @@ export class CreateVertex1726740255217 implements MigrationInterface {
                 }
             ]
         }))
-
-        await queryRunner.createForeignKey('vertices', new TableForeignKey({
-            columnNames: ['sessionId'],
-            referencedColumnNames: ['id'],
-            referencedTableName: 'sessions',
-            onDelete: 'CASCADE',
-        }));
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {

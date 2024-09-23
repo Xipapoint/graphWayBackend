@@ -1,5 +1,5 @@
 import { Repository } from "typeorm";
-import { Edge } from "../../entities/structures/Edge";
+import { Edge } from "../../entities/structures/EdgeWithCoords";
 import { BaseRepository } from "../baseRepository";
 import { IEdgeRepositoryImpl } from "../impl/repos/edgeRepositoryImpl";
 import { AppDataSource } from "../../dataSource";

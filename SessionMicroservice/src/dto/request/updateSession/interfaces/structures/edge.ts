@@ -1,4 +1,4 @@
-import { Edge } from "../../../../../entities/structures/Edge";
+import { Edge } from "../../../../../entities/structures/EdgeWithCoords";
 import { IBaseCreateOrUpdateRequestDTO } from "../../BaseCreateOrUpdateRequestDTO";
 
 export interface IEdge<T extends Edge> extends IBaseCreateOrUpdateRequestDTO<T>{
