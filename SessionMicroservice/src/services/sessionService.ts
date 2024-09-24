@@ -32,9 +32,12 @@ import { IVertex } from "../dto/request/updateSession/interfaces/structures/vert
 import { IEdge } from "../dto/request/updateSession/interfaces/structures/edge";
 import { IBaseCreateOrUpdateRequestDTO } from '../dto/request/updateSession/BaseCreateOrUpdateRequestDTO';
 import { IGraphSessionRepositoryImpl } from '../repository/impl/repos/graphSessionRepositoryImpl';
+import { ITreeSessionRepositoryImpl } from '../repository/impl/repos/treeSessionRepositoryImpl';
+import { ICreateTreeSessionResponseDTO } from '../dto/response/session/CreateTreeSessionRepository.interface';
 
 class SessionService implements ISessionServiceImpl{
     private sessionGraphRepository: IGraphSessionRepositoryImpl
+    private sessionTreeRepository: ITreeSessionRepositoryImpl
     private sessionStructRepository: ISessionStructRepositoryImpl
     private sessionTypeRepository: ISessionTypeRepositoryImpl
     private sessionAlghorithmRepository: ISessionAlghoRepositoryImpl
@@ -46,7 +49,8 @@ class SessionService implements ISessionServiceImpl{
         sessionTypeRepository: ISessionTypeRepositoryImpl, 
         sessionAlghorithmRepository: ISessionAlghoRepositoryImpl,
         sessionVertexRepository: IVertexRepositoryImpl,
-        sessionEdgeRepository: IEdgeRepositoryImpl
+        sessionEdgeRepository: IEdgeRepositoryImpl,
+        sessionTreeRepository: ITreeSessionRepositoryImpl
     ){
         this.sessionGraphRepository = sessionGraphRepository
         this.sessionStructRepository = sessionStructRepository
@@ -54,6 +58,7 @@ class SessionService implements ISessionServiceImpl{
         this.sessionAlghorithmRepository = sessionAlghorithmRepository
         this.sessionVertexRepository = sessionVertexRepository
         this.sessionEdgeRepository = sessionEdgeRepository
+        this.sessionTreeRepository = sessionTreeRepository
     }
 
     private async verifyUserExists(userId: string): Promise<void> {
@@ -139,7 +144,7 @@ class SessionService implements ISessionServiceImpl{
     }
 
     //PUBLIC
-    async createSession(createSessionData: ICreateSessionRequestDTO): Promise<ICreateSessionResponseDTO> {
+    async createSession(createSessionData: ICreateSessionRequestDTO): Promise<ICreateGraphSessionResponseDTO | ICreateTreeSessionResponseDTO> {
         try {
             const {sessionTypeId, sessionStructId, alghorithmId, userId} = createSessionData
             const existingSessionType = await this.sessionTypeRepository.findSessionType(sessionTypeId);
@@ -153,16 +158,26 @@ class SessionService implements ISessionServiceImpl{
                     alghorithm: existingAlghorithm
                 })
             } else {
-                session = this.sessionGraphRepository.create({
+                session = this.sessionTreeRepository.create({
                     userId,
-                    alghorithm: existingAlghorithm
+                    structure: existingSessionStructure
                 })
             }
-            const response: ICreateGraphSessionResponseDTO = {
-                id: session.id, 
+            let response: ICreateGraphSessionResponseDTO | ICreateTreeSessionResponseDTO
+            existingSessionType.name === 'Graph' ? 
+            response = {
+                id: session.id,
                 name: session.sessionName,
-                sessionType: existingSessionType.name,
-                sessionStruct:existingSessionStructure.name,
+                imagePath: session.sessionImagePath,
+                alghorithm: existingAlghorithm.name,
+                type: existingSessionType.name
+            } :
+            response = {
+                id: session.id,
+                name: session.sessionName,
+                type: existingSessionType.name,
+                structure: existingSessionStructure.name,
+                imagePath: session.sessionImagePath,
             }
             return response
         } catch(error){
