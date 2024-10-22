@@ -1,0 +1,133 @@
+syntax = "proto3";
+
+message UpdateTreeSessionRequestDTO {
+    repeated UpdateOrDeleteSessionVertexPairRequestDTO vertices = 2;
+    repeated UpdateSessionEdgeRequestDTO edges = 3;
+    string sessionId = 4;
+    string imageBase64 = 5;
+}
+
+message UpdateCoordsTreeSessionRequestDTO {
+    repeated UpdateOrDeleteSessionVertexPairRequestDTO vertices = 2;
+    repeated UpdateSessionEdgeCoordsRequestDTO edges = 3;
+    string sessionId = 4;
+    string imageBase64 = 5;
+}
+
+message UpdateWeightedTreeSessionRequestDTO{
+    repeated UpdateOrDeleteSessionVertexPairRequestDTO vertices = 2;
+    repeated IUpdateSessionWeightedEdgeRequestDTO edges = 3;
+    string sessionId = 4;
+    string imageBase64 = 5;
+}
+
+message UpdateWeightedCoordsTreeSessionRequestDTO{
+    repeated UpdateOrDeleteSessionVertexPairRequestDTO vertices = 2;
+    repeated IUpdateSessionWeightedEdgeWithCoordsRequestDTO edges = 3;
+    string sessionId = 4;
+    string imageBase64 = 5;
+}
+
+message UpdateGraphSessionRequestDTO {
+    repeated UpdateOrDeleteSessionVertexPairRequestDTO vertices = 2;
+    repeated UpdateSessionEdgeRequestDTO edges = 3;
+    string sessionId = 4;
+    string imageBase64 = 5;
+}
+
+message UpdateCoordsGraphSessionRequestDTO {
+    repeated UpdateOrDeleteSessionVertexPairRequestDTO vertices = 2;
+    repeated UpdateSessionEdgeCoordsRequestDTO edges = 3;
+    string sessionId = 4;
+    string imageBase64 = 5;
+}
+
+message UpdateWeightedCoordsGraphSessionRequestDTO {
+    repeated UpdateOrDeleteSessionVertexPairRequestDTO vertices = 2;
+    repeated IUpdateSessionWeightedEdgeWithCoordsRequestDTO edges = 3;
+    string sessionId = 4;
+    string imageBase64 = 5;
+}
+
+message UpdateWeightedGraphSessionRequestDTO {
+    repeated UpdateOrDeleteSessionVertexPairRequestDTO vertices = 2;
+    repeated UpdateSessionWeightedEdgeRequestDTO edges = 3;
+    string sessionId = 4;
+    string imageBase64 = 5;
+}
+
+message UpdateSessionEdgeRequestDTO {
+    int32 id = 1;
+    UPDATE_TYPE updateType = 2;
+    EdgeBase edge = 3;
+}
+
+message UpdateSessionEdgeCoordsRequestDTO {
+    int32 id = 1;
+    UPDATE_TYPE updateType = 2;
+    EdgeWithCoords edge = 3;
+}
+
+message UpdateSessionWeightedEdgeRequestDTO {
+    int32 id = 1;
+    UPDATE_TYPE updateType = 2;
+    WeightedEdge edge = 3;
+}
+
+message UpdateSessionWeightedEdgeWithCoordsRequestDTO {
+    int32 id = 1;
+    UPDATE_TYPE updateType = 2;
+    WeightedEdgeWithCoords edge = 3;
+}
+
+message EdgeBase {
+    int32 index = 1;
+    int32 startVertex = 2;
+    int32 endVertex = 3;
+    bool isShortest = 4;
+}
+
+message WeightedEdge {
+    int32 index = 1;
+    int32 startVertex = 2;
+    int32 endVertex = 3;
+    bool isShortest = 4;
+    float weight = 5;
+}
+
+message WeightedEdgeWithCoords {
+    int32 index = 1;
+    int32 startVertex = 2;
+    int32 endVertex = 3;
+    bool isShortest = 4;
+    float weight = 5;
+    float top = 6;
+    float left = 7;
+    float angle = 8;
+}
+
+message EdgeWithCoords{
+    int32 index = 1;
+    int32 startVertex = 2;
+    int32 endVertex = 3;
+    bool isShortest = 4;
+    float top = 6;
+    float left = 7;
+    float angle = 8;
+}
+
+message UpdateOrDeleteSessionVertexPairRequestDTO {
+    UPDATE_TYPE updateType = 1;
+    int32 id = 2;
+    VertexPair vertex = 3;
+}
+
+message VertexPair {
+    repeated int32 pair = 1;
+}
+
+enum UPDATE_TYPE {
+    ADD = 0;
+    DELETE = 1;
+    MODIFY = 2;
+}

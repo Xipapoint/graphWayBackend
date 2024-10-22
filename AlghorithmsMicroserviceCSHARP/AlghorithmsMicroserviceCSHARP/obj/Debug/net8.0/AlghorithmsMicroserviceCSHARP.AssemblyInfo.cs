@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AlghorithmsMicroserviceCSHARP")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+83d573f7bdda22677191d83102fce85f1590b588")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+922812ee3e8fa539a211fcee638b026c1d20c5f8")]
 [assembly: System.Reflection.AssemblyProductAttribute("AlghorithmsMicroserviceCSHARP")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AlghorithmsMicroserviceCSHARP")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

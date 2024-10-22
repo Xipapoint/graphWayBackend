@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { ICreateSessionRequestDTO } from "../dto/request/createSession/CreateGraphSessionRequestDTO";
-import { IUpdateSessionRequestDTO } from "../dto/request/updateSession/UpdateSessionRequestDTO";
 import { ISessionServiceImpl } from "../services/impl/sessionServiceImpl";
 import sessionService from "../services/sessionService";
+import { UpdateRequestTypes } from "../dto/request/updateSession/UpdateRequestTypes.interface";
 
 class SessionController {
     private sessionService: ISessionServiceImpl;
@@ -48,10 +48,10 @@ class SessionController {
         }
     }
 
-    async updateSession(req: Request, res: Response, next: NextFunction): Promise<void> {
+    async updateSession(req: Request<{}, {}, UpdateRequestTypes>, res: Response, next: NextFunction): Promise<void> {
         try {
-            const sessionUpdate: IUpdateSessionRequestDTO = req.body;
-            const updatedSession = await this.sessionService.updateSession(sessionUpdate);
+            const {serializedData, sessionType, weightType, dataType} = req.body
+            const updatedSession = await this.sessionService.updateSession(serializedData, sessionType, weightType, dataType);
             res.status(200).json(updatedSession);
         } catch (error) {
             next(error);

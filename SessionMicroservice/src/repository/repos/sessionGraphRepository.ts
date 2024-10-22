@@ -22,6 +22,10 @@ class GraphSessionRepository extends BaseRepository<GraphSessions> implements IG
         if (!sessionType) throw new NotFoundError("Session type doesnt exist");
         return sessionType;
     }
+
+    getRepository(){
+        return this.graphSessionRepository
+    }
     
 }
 export default new GraphSessionRepository(AppDataSource.getRepository(GraphSessions))

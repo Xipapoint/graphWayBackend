@@ -22,5 +22,9 @@ class TreeSessionRepository extends BaseRepository<TreeSessions> implements ITre
         if (!sessionType) throw new NotFoundError("Session type doesnt exist");
         return sessionType;
     }
+
+    getRepository(){
+        return this.treeSessionRepository
+    }
 }
 export default new TreeSessionRepository(AppDataSource.getRepository(TreeSessions))

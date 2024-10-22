@@ -5,3 +5,11 @@ export interface IDeleteSessionVertexRequestDTO{
 export interface IDeleteSessionEdgeRequestDTO{
     id: number
 }
+
+export interface IDeleteSessionWeightedEdgeRequestDTO{
+    id: number
+}
+
+export interface IDeleteSessionWeightedEdgeWithCordsRequestDTO{
+    id: number
+}

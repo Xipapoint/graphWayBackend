@@ -3,5 +3,5 @@ export interface ICreateGraphSessionResponseDTO{
     name: string
     type: string
     alghorithm: string
-    imagePath: string
+    imagePath?: string
 }

@@ -10,5 +10,8 @@ export class BaseStructureEntity extends BaseEntity{
 
     @Column()
     isShortest: boolean
+
+    @Column()
+    sessionId: string;
     
 }

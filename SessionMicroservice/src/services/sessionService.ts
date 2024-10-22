@@ -10,13 +10,10 @@ import NotFoundError from "../error/4__Error/NotFoundError.error";
 import { IGetSessionStructuresResponseDTO } from "../dto/response/session/GetSessionStructuresResponseDTO";
 import { IGetAlgosResponseDTO } from "../dto/response/session/GetAlgosResponseDTO";
 import { IGetSessionTypesResponseDTO } from "../dto/response/session/GetSessionTypesResponseDTO";
-import { IUpdateSessionRequestDTO } from "../dto/request/updateSession/UpdateSessionRequestDTO";
 import { Vertex } from "../entities/structures/base/Vertex";
 import { ISessionStructRepositoryImpl } from "../repository/impl/repos/sessionStructRepositoryImpl";
 import { ISessionTypeRepositoryImpl } from "../repository/impl/repos/sessionTypeRepositoryImpl";
 import { ISessionAlghoRepositoryImpl } from '../repository/impl/repos/sessionAlghoRepositoryImpl';
-import { IUpdateOrDeleteSessionVertexRequestDTO } from "../dto/request/updateSession/updateSessionData/UpdateSessionVertexRequestDTO";
-import { IUpdateOrDeleteSessionEdgeRequestDTO } from "../dto/request/updateSession/updateSessionData/UpdateSessionEdgeRequestDTO";
 import { AppDataSource } from "../dataSource";
 import sessionStructRepository from "../repository/repos/sessionStructRepository";
 import sessionTypeRepository from "../repository/repos/sessionTypeRepository";
@@ -28,12 +25,18 @@ import VertexRepository from "../repository/repos/vertexRepository";
 import { IBaseRepositoryImpl } from "../repository/impl/baseRepositoryImpl";
 import { IEdgeRepositoryImpl } from "../repository/impl/repos/edgeRepositoryImpl";
 import edgeRepository from "../repository/repos/edgeRepository";
-import { IVertex } from "../dto/request/updateSession/interfaces/structures/vertex";
-import { IEdge } from "../dto/request/updateSession/interfaces/structures/edge";
-import { IBaseCreateOrUpdateRequestDTO } from '../dto/request/updateSession/BaseCreateOrUpdateRequestDTO';
 import { IGraphSessionRepositoryImpl } from '../repository/impl/repos/graphSessionRepositoryImpl';
 import { ITreeSessionRepositoryImpl } from '../repository/impl/repos/treeSessionRepositoryImpl';
 import { ICreateTreeSessionResponseDTO } from '../dto/response/session/CreateTreeSessionRepository.interface';
+import sessionGraphRepository from '../repository/repos/sessionGraphRepository';
+import sessionTreeRepository from '../repository/repos/sessionTreeRepository';
+import { GraphSessions } from '../entities/session/GraphSession';
+import { TreeSessions } from '../entities/session/TreeSession';
+import { decodeUpdateCoordsGraphSessionRequestDTO, decodeUpdateCoordsTreeSessionRequestDTO, decodeUpdateGraphSessionRequestDTO, decodeUpdateTreeSessionRequestDTO, decodeUpdateWeightedCoordsGraphSessionRequestDTO, decodeUpdateWeightedCoordsTreeSessionRequestDTO, decodeUpdateWeightedGraphSessionRequestDTO, decodeUpdateWeightedTreeSessionRequestDTO, EdgeBase, UPDATE_TYPE, UpdateCoordsGraphSessionRequestDTO, UpdateCoordsTreeSessionRequestDTO, UpdateGraphSessionRequestDTO, UpdateOrDeleteSessionVertexBaseRequestDTO, UpdateOrDeleteSessionVertexPairRequestDTO, UpdateSessionEdgeRequestDTO, UpdateSessionWeightedEdgeRequestDTO, UpdateTreeSessionRequestDTO, UpdateWeightedCoordsGraphSessionRequestDTO, UpdateWeightedGraphSessionRequestDTO, VertexBase, VertexPair, UpdateWeightedTreeSessionRequestDTO, UpdateWeightedCoordsTreeSessionRequestDTO, UpdateSessionEdgeCoordsRequestDTO, WeightedEdgeWithCoords, EdgeWithCoords } from '../config/proto/session_pb';
+import { ConflictError } from '../error/4__Error/ConflictError.error';
+import { IVertexBase } from '../dto/request/updateSession/interfaces/structures/base/VertexBase.interface';
+import { IVertexPair } from '../dto/request/updateSession/interfaces/structures/VertexPair.interface';
+import { WeightedEdge } from '../entities/structures/WeightedEdge';
 
 class SessionService implements ISessionServiceImpl{
     private sessionGraphRepository: IGraphSessionRepositoryImpl
@@ -91,19 +94,18 @@ class SessionService implements ISessionServiceImpl{
     }
     
 
-    private async updateVertices(updateVertices: IUpdateOrDeleteSessionVertexRequestDTO[], manager: EntityManager, sessionId: string) {
-        const creatOperationVertices: IVertex<Vertex>[] = []
-        const updateOperationVertices: IVertex<Vertex>[] = []
+    private async updateVertices(updateVertices: UpdateOrDeleteSessionVertexPairRequestDTO[], manager: EntityManager, sessionId: string, dataType: DATA_TYPE) {
+        const creatOperationVertices: VertexPair[] = []
+        const updateOperationVertices: VertexPair[] = []
         const deleteOperationVertices: number[] = []
         const promises: Promise<void>[] = []
         for (const updateVertex of updateVertices) {
-            const updateType = updateVertex.updateType
-            if (updateType === 'delete') {
-                deleteOperationVertices.push(updateVertex.id)
+            const updateType = updateVertex.updateType!
+            if (updateType === UPDATE_TYPE.DELETE) {
+                deleteOperationVertices.push(updateVertex.id!)
             } else {
                 const vertex = updateVertex.vertex!
-                const whereCondition = updateType === 'update' ? vertex.id : undefined
-                whereCondition ? updateOperationVertices.push(vertex) : creatOperationVertices.push(vertex)
+                updateType === UPDATE_TYPE.MODIFY ? updateOperationVertices.push(vertex) : creatOperationVertices.push(vertex)
             }
         }
         promises.push(this.deleteEntity<Vertex>(this.sessionVertexRepository, deleteOperationVertices, manager))
@@ -117,12 +119,27 @@ class SessionService implements ISessionServiceImpl{
         await Promise.all(promises)
     }
 
-    private async updateEdges(updateEdges: IUpdateOrDeleteSessionEdgeRequestDTO[], manager: EntityManager, sessionId: string) {
-        const createOperationEdges: IEdge<Edge>[] = []
-        const updateOperationEdges: IEdge<Edge>[] = []
+    private async updateEdges(
+        updateEdges: (
+            | UpdateSessionEdgeRequestDTO[]
+            | UpdateSessionWeightedEdgeRequestDTO[]
+            | UpdateSessionEdgeCoordsRequestDTO[]
+            | UpdateSessionEdgeCoordsRequestDTO[]
+        ),
+        manager: EntityManager,
+        sessionId: string
+    ): Promise<void> {
+        const createOperationEdges: EdgeBase[] | WeightedEdge[] | WeightedEdgeWithCoords[] | EdgeWithCoords[] = []
+        const updateOperationEdges: EdgeBase[] | WeightedEdge[] | WeightedEdgeWithCoords[] | EdgeWithCoords[] = []
         const deleteOperationEdges: number[] = []
         const promises: Promise<void>[] = []
+        const operationHandlers: Record<string, (edge: any, id?: number) => void> = {
+            delete: (_, id) => deleteOperationEdges.push(id!),
+            update: (edge) => edge && updateOperationEdges.push(edge),
+            create: (edge) => edge && createOperationEdges.push(edge),
+        };
         for (const updateEdge of updateEdges) {
+            const { updateType, edge, id } = updateEdge;
             const updateType = updateEdge.updateType
             if (updateType === 'delete') {
                 deleteOperationEdges.push(updateEdge.id)
@@ -141,6 +158,48 @@ class SessionService implements ISessionServiceImpl{
             sessionId
         ))
         await Promise.all(promises)
+    }
+
+    private decodeUpdateSessionData(
+        serializedData: Uint8Array, 
+        sessionType: SESSIONTYPE, 
+        weightType: WEIGHTTYPE, 
+        dataType: DATATYPE
+    ) {
+        const decoders = {
+            Graph: {
+                Weighted: {
+                    visualized: decodeUpdateWeightedCoordsGraphSessionRequestDTO(serializedData),
+                    text: decodeUpdateWeightedGraphSessionRequestDTO(serializedData),
+                },
+                NoWheighted: {
+                    visualized: decodeUpdateCoordsGraphSessionRequestDTO(serializedData),
+                    text: decodeUpdateGraphSessionRequestDTO(serializedData),
+                },
+            },
+            Tree: {
+                Weighted: {
+                    visualized: decodeUpdateWeightedCoordsTreeSessionRequestDTO(serializedData),
+                    text: decodeUpdateWeightedTreeSessionRequestDTO(serializedData),
+                },
+                NoWheighted: {
+                    visualized: decodeUpdateCoordsTreeSessionRequestDTO(serializedData),
+                    text: decodeUpdateTreeSessionRequestDTO(serializedData),
+                },
+            },
+        };
+        if (!decoders[sessionType]) {
+            throw new Error(`Unsupported session type: ${sessionType}`);
+        }
+        if (!decoders[sessionType][weightType]) {
+            throw new Error(`Unsupported weight type: ${weightType}`);
+        }
+        if (!decoders[sessionType][weightType][dataType]) {
+            throw new Error(`Unsupported data type: ${dataType}`);
+        }
+    
+        const decoder = decoders[sessionType][weightType][dataType];   
+        return decoder         
     }
 
     //PUBLIC
@@ -232,24 +291,28 @@ class SessionService implements ISessionServiceImpl{
         }
     }
 
-    async updateSession(sessionUpdate: IUpdateSessionRequestDTO): Promise<boolean> {
-        
-        await this.sessionRepository.manager.transaction(async (manager: EntityManager) => {
-            const sessionId = sessionUpdate.sessionId
-            const session = await this.sessionRepository.findOne({where: {id: sessionId}})
-            if(!session) throw new NotFoundError("Session doesnt exist")
-            const vertices = sessionUpdate.vertices
-            const edges = sessionUpdate.edges
+    async updateSession(serializedSessionData: Uint8Array, sessionType: SESSIONTYPE, weightType: WEIGHTTYPE, dataType: DATATYPE): Promise<boolean> {
+        const sessionData = this.decodeUpdateSessionData(serializedSessionData, sessionType, weightType, dataType)
+        const {sessionId, vertices, edges, imageBase64 } = sessionData
+        if(!sessionId) throw new ConflictError("Session id must be provided")
+        const graphPromise = this.sessionGraphRepository.findGraphSession(sessionId).then(result => ({ type: 'Graph', result }))
+        const treePromise = this.sessionTreeRepository.findTreeSession(sessionId).then(result => ({ type: 'Tree', result }))
+        const firstResolved = await Promise.race([graphPromise, treePromise])
+        const sessionRepository = firstResolved.type === 'Graph' ? this.sessionGraphRepository : this.sessionTreeRepository
+        const session = firstResolved.result
+
+
+        await sessionRepository.getRepository().manager.transaction(async (manager: EntityManager) => {
+            const verticesRepo = this.sessionVertexRepository
             const promises: Promise<void>[] = []
             if(vertices){
-                promises.push(this.updateVertices(vertices, manager, sessionId))
+                promises.push(this.updateVertices(vertices, manager, sessionId, dataType!))
             }
             if(edges){
                 promises.push(this.updateEdges(edges, manager, sessionId))
             }
             await Promise.all(promises)
-            let imagePath: string | undefined;
-            const imageBase64 = sessionUpdate.imageBase64
+            let imagePath: string | undefined
             let filename: string
             if (imageBase64) {
               const base64Data = imageBase64.replace(/^data:image\/png;base64,/, '');
@@ -276,10 +339,11 @@ class SessionService implements ISessionServiceImpl{
 }
 
 export default new SessionService(
-    AppDataSource.getRepository(Session), 
+    sessionGraphRepository,
     sessionStructRepository, 
     sessionTypeRepository, 
     sessionAlghoRepository, 
     VertexRepository, 
-    edgeRepository
+    edgeRepository,
+    sessionTreeRepository
 )

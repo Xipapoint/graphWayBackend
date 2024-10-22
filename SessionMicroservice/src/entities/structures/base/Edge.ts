@@ -9,9 +9,6 @@ export class Edge extends BaseStructureEntity{
     @Column()
     endVertex: number;
   
-    @Column()
-    sessionId: string;
-  
     @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
     createdAt: Date;
   

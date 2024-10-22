@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table, TableForeignKey } from "typeorm";
+import { MigrationInterface, QueryRunner, Table, TableForeignKey, TableIndex } from "typeorm";
 
 export class CreateVertex1726740255217 implements MigrationInterface {
 
@@ -50,9 +50,14 @@ export class CreateVertex1726740255217 implements MigrationInterface {
                 }
             ]
         }))
+        await queryRunner.createIndex('vertices', new TableIndex({
+            name: 'IDX_VERTICES_SESSION_ID',
+            columnNames: ['sessionId'],
+        }));
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.dropIndex('vertices', 'IDX_VERTICES_SESSION_ID')
         await queryRunner.dropTable('vertices')
     }
 
