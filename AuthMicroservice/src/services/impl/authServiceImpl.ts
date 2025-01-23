@@ -10,4 +10,5 @@ export interface IAuthServiceImpl{
         refreshToken: string;
         id: string;
     }>
+    logout(refreshToken: string): Promise<void>
 }

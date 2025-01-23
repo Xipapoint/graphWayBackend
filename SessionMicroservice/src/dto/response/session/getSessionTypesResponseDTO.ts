@@ -1,4 +1,4 @@
 export interface IGetSessionTypesResponseDTO{
-    sessionType: string,
+    sessionTypeName: string,
     sessionImage: string
 }

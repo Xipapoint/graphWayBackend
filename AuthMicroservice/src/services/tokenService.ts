@@ -14,9 +14,9 @@ class tokenService implements ITokenServiceImpl{
         this.tokenRepository = tokenRepository
         this.jwt = jwt;
     }
-    public generateTokens(userId: string, userAge: number, rememberMe: boolean) : IJwtUserResponseDto {
-        const payload = {userId, userAge}
-        const refreshTokenExpiry = rememberMe ? '30d' : '7d';
+    public async generateTokens(userId: string) : Promise<IJwtUserResponseDto> {
+        const payload = {userId}
+        const refreshTokenExpiry = '7d';
         const accessToken = this.jwt.sign(
             payload,
             process.env.JWT_ACCESS_SECRET as string,
@@ -27,9 +27,16 @@ class tokenService implements ITokenServiceImpl{
             process.env.JWT_REFRESH_SECRET as string,
             { expiresIn: refreshTokenExpiry }
         );
-        const refreshTokenEntity: Token = this.tokenRepository.create({userId, refreshToken})
-        this.tokenRepository.save(refreshTokenEntity)
-
+        const existingToken = await this.tokenRepository.findOne({ where: { userId } });
+        console.log("is token existing:", existingToken);
+        
+        if (existingToken) {
+            existingToken.refreshToken = refreshToken;
+            await this.tokenRepository.save(existingToken);
+        } else {
+            const refreshTokenEntity: Token = this.tokenRepository.create({ userId, refreshToken });
+            await this.tokenRepository.save(refreshTokenEntity);
+        }
         return {
             accessToken,
             refreshToken,
@@ -44,7 +51,7 @@ class tokenService implements ITokenServiceImpl{
             tokenData.refreshToken = refreshToken;
             return tokenRepository.save(tokenData);
         }
-        const token = await tokenRepository.create({userId: userId, refreshToken})
+        const token = tokenRepository.create({userId: userId, refreshToken})
         return token;
     }
 
@@ -62,9 +69,16 @@ class tokenService implements ITokenServiceImpl{
         return jwt.verify(token, process.env.JWT_REFRESH_SECRET as string) as JwtPayload;
     }
 
-    async findToken(refreshToken: string) {
+    public async findToken(refreshToken: string) {
         return await this.tokenRepository.findOneBy({refreshToken})
     }
+
+    public async removeToken(refreshToken: string){
+        await this.tokenRepository.delete({refreshToken})
+        console.log("deleting");
+        
+    }
+
 }
 
 export default new tokenService(AppDataSource.getRepository(Token));

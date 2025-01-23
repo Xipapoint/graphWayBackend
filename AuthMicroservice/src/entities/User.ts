@@ -12,18 +12,15 @@ export class User {
   @Column()
   hashedPassword: string;
 
-  @Column()
+  @Column({unique: true})
   email: string;
 
   // Only one role is able
   @Column({ default: 'USER' })
   role: string;
 
-  @Column()
-  age: number;
-
   @Column({ nullable: true })
-  avatar: string;
+  avatar?: string;
 
   @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;

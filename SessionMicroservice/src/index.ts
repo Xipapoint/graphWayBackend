@@ -5,6 +5,10 @@ const app: Application = express();
 import dotenv from "dotenv";
 import { AppDataSource } from './dataSource';
 const allowedOrigins = ['http://localhost:5173'];
+import swaggerUi from 'swagger-ui-express'
+import { swaggerSpec } from './config/swagger';
+import { router } from './router';
+import errorMiddleware from './middleware/errorMiddleware';
 
 app.use(helmet());
 const corsOptions = {
@@ -26,15 +30,15 @@ app.use(
     extended: true,
   })
 );
-// app.use('/api', router)
-
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api', router)
+app.use(errorMiddleware)
 const PORT = process.env.PORT as number | undefined
 
 const start = async () => {
   try {
     AppDataSource.initialize();
     app.listen(PORT, () => console.log(`Server started on PORT = ${PORT}`));
-
     
   } catch (e) {
     console.log(e);

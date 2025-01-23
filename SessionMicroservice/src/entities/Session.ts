@@ -4,68 +4,43 @@ import {
     Column,
     ManyToOne,
     OneToMany,
-    BeforeInsert
+    BeforeInsert,
+    BaseEntity
   } from 'typeorm';
-import { Vertex } from './Vertex';
-import { Edge } from './Edge';
 import { Security } from '../utils/security';
+import { Alghorithm } from './types/Alghorithm';
+import { Type } from './types/Type';
+import { Structure } from './types/Structures';
   
-  @Entity()
-  export class Session {
+ @Entity('sessions')
+  export class Session extends BaseEntity {
     @PrimaryGeneratedColumn('uuid')
-    id: number;
-  
-    @Column({ unique: true })
-    visibleId: string;
+    id: string;
   
     @Column({unique: false})
     sessionName: string;
 
-    @Column()
-    sessionType: string
-
-    @Column()
-    sessionImage: string
-  
-    @Column()
-    structType: string;
-    
-    @Column()
-    structImage: string
-
-    @Column()
-    structDescription: string;
+    @Column({nullable: true})
+    sessionImagePath?: string;
     
     @Column({nullable: true})
-    alghorithm?: string
+    alghorithm?: Alghorithm
 
-    @Column({nullable: true})
-    alghorithmImage?: string
-
-    @Column({nullable: true})
-    alghorithmDescription?: string
-
-    @OneToMany(() => Vertex, vertex => vertex.vertexId)
-    vertices: Vertex[];
-  
-    @OneToMany(() => Edge, edge => edge.session)
-    edges: Edge[];
-  
     @Column({ nullable: true, type: 'simple-array' })
     shortestVertices?: number[];
   
     @Column()
     userId: string
 
-    @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
-    createdAt: Date;
+    @Column()
+    sessionType: Type
   
-    @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
-    updatedAt: Date;
+    @Column()
+    structType: Structure;
 
     @BeforeInsert()
     setSessionName(){
       this.sessionName = Security.generateRandomString()
     }
 
-  }
+  } 

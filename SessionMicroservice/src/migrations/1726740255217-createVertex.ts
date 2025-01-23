@@ -1,0 +1,64 @@
+import { MigrationInterface, QueryRunner, Table, TableForeignKey, TableIndex } from "typeorm";
+
+export class CreateVertex1726740255217 implements MigrationInterface {
+
+    public async up(queryRunner: QueryRunner): Promise<void> {
+        queryRunner.createTable(new Table({
+            name: 'vertices',
+            columns:[
+                {
+                    name: 'id',
+                    type: 'int',
+                    isPrimary: true,
+                    isGenerated: true,
+                    generationStrategy: 'increment',
+                },
+                {
+                    name: 'index',
+                    type: 'int',
+                },
+                {
+                    name: 'xCord',
+                    type: 'int',
+                    isNullable: true,
+                },
+                {
+                    name: 'yCord',
+                    type: 'int',
+                    isNullable: true,
+                },
+                {
+                    name: 'pair',
+                    type: 'int',
+                    isNullable: true,
+                    isArray: true,
+                },
+                {
+                    name: 'sessionId',
+                    type: 'uuid',
+                    isNullable: true,
+                },
+                {
+                    name: 'createdAt',
+                    type: 'timestamptz',
+                    default: 'CURRENT_TIMESTAMP',
+                },
+                {
+                    name: 'updatedAt',
+                    type: 'timestamptz',
+                    default: 'CURRENT_TIMESTAMP',
+                }
+            ]
+        }))
+        await queryRunner.createIndex('vertices', new TableIndex({
+            name: 'IDX_VERTICES_SESSION_ID',
+            columnNames: ['sessionId'],
+        }));
+    }
+
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.dropIndex('vertices', 'IDX_VERTICES_SESSION_ID')
+        await queryRunner.dropTable('vertices')
+    }
+
+}
