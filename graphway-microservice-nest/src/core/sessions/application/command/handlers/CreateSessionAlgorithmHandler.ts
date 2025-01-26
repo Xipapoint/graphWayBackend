@@ -4,7 +4,7 @@ import { Transactional } from 'src/core/sessions/libs/Transactional';
 
 import { InjectionToken } from '../../InjectToken';
 import { CreateSessionAlgorithmCommand } from '../CreateSessionAlgorithmCommand';
-import { SessionTypeFactory } from 'src/core/sessions/domain/factories/SessionTypesFactory';
+import { SessionTypeFactory } from 'src/core/sessions/domain/factories/SessionDataStructureFactory';
 import { SessionTypeRepository } from 'src/core/sessions/domain/repositories/SessionDataStructureRepository';
 
 @CommandHandler(CreateSessionAlgorithmCommand)

@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateSessionDataStructureCommand } from '../CreateSessionDataStructureCommand';
 import { Inject } from '@nestjs/common';
-import { SessionTypeFactory } from 'src/core/sessions/domain/factories/SessionTypesFactory';
-import { SessionTypeRepository } from 'src/core/sessions/domain/repositories/SessionDataStructureRepository';
+import { SessionDataStructureFactory } from 'src/core/sessions/domain/factories/SessionDataStructureFactory';
+import { SessionDataStructureRepository } from 'src/core/sessions/domain/repositories/SessionDataStructureRepository';
 import { Transactional } from 'src/core/sessions/libs/Transactional';
 import { InjectionToken } from '../../InjectToken';
 
@@ -10,17 +10,24 @@ import { InjectionToken } from '../../InjectToken';
 export class CreateSessionDataStructureHandler
   implements ICommandHandler<CreateSessionDataStructureCommand, void>
 {
-  @Inject() private readonly sessionTypeFactory: SessionTypeFactory;
-  @Inject(InjectionToken.SESSION_TYPE_REPOSITORY)
-  private readonly sessionTypeRepository: SessionTypeRepository;
+  @Inject()
+  private readonly sessionDataStructureFactory: SessionDataStructureFactory;
+  @Inject(InjectionToken.SESSION_DATA_STRUCTURE_REPOSITORY)
+  private readonly sessionDataStructureRepository: SessionDataStructureRepository;
   @Transactional()
   async execute(command: CreateSessionDataStructureCommand): Promise<void> {
-    const sessionType = this.sessionTypeFactory.create({
+    const isExists = await this.sessionDataStructureRepository.exists(
+      command.title,
+    );
+
+    if (isExists) throw new Error('Session mode already exists');
+
+    const sessionDataStructure = this.sessionDataStructureFactory.create({
       id: crypto.randomUUID(), // TODO: Implement module to create entity things
       ...command,
     });
 
-    await this.sessionTypeRepository.save(sessionType);
-    sessionType.commit();
+    await this.sessionDataStructureRepository.save(sessionDataStructure);
+    sessionDataStructure.commit();
   }
 }

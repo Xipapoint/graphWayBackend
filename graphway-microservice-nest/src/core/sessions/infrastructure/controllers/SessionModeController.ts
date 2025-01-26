@@ -14,7 +14,7 @@ import { CreateSessionModeRequestDTO } from '../dto/request/CreateSessionModeReq
 import { CreateSessionModeCommand } from '../../application/command/CreateSessionModeCommand';
 
 @ApiTags('session-modes')
-@Controller()
+@Controller('session-modes')
 export class SessionModeController {
   constructor(
     readonly commandBus: CommandBus,

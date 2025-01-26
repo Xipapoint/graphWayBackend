@@ -1,6 +1,6 @@
-import { IQueryResult } from '@nestjs/cqrs';
+import { FindSessionComponentByIdResult } from './base/FindSessionComponentByIdResult';
 
-export class FindSessionModeByIdResult implements IQueryResult {
+export class FindSessionModeByIdResult extends FindSessionComponentByIdResult {
   readonly id: number;
   readonly title: string;
   readonly description: string;

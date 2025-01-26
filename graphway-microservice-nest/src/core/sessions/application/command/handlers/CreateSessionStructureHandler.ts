@@ -2,26 +2,32 @@ import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Transactional } from 'src/core/sessions/libs/Transactional';
 
+import { SessionStructureFactory } from 'src/core/sessions/domain/factories/SessionStructureFactory';
+import { SessionStructureRepository } from 'src/core/sessions/domain/repositories/SessionStructureRepository';
 import { InjectionToken } from '../../InjectToken';
 import { CreateSessionStructureCommand } from '../CreateSessionStructureCommand';
-import { SessionTypeFactory } from 'src/core/sessions/domain/factories/SessionTypesFactory';
-import { SessionTypeRepository } from 'src/core/sessions/domain/repositories/SessionDataStructureRepository';
 
 @CommandHandler(CreateSessionStructureCommand)
 export class CreateSessionStructureHandler
   implements ICommandHandler<CreateSessionStructureCommand, void>
 {
-  @Inject() private readonly sessionTypeFactory: SessionTypeFactory;
-  @Inject(InjectionToken.SESSION_TYPE_REPOSITORY)
-  private readonly sessionTypeRepository: SessionTypeRepository;
+  @Inject() private readonly sessionStructureFactory: SessionStructureFactory;
+  @Inject(InjectionToken.SESSION_STRUCTURE_REPOSITORY)
+  private readonly sessionStructureRepository: SessionStructureRepository;
   @Transactional()
   async execute(command: CreateSessionStructureCommand): Promise<void> {
-    const sessionType = this.sessionTypeFactory.create({
+    const isExists = await this.sessionStructureRepository.exists(
+      command.title,
+    );
+
+    if (isExists) throw new Error('Session mode already exists');
+
+    const sessionStructure = this.sessionStructureFactory.create({
       id: crypto.randomUUID(), // TODO: Implement module to create entity things
       ...command,
     });
 
-    await this.sessionTypeRepository.save(sessionType);
-    sessionType.commit();
+    await this.sessionStructureRepository.save(sessionStructure);
+    sessionStructure.commit();
   }
 }

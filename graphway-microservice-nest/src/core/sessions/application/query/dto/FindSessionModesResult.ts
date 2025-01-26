@@ -1,12 +1,14 @@
-import { IQueryResult } from '@nestjs/cqrs';
+import { FindResult } from './base/FindResult';
 
-export class FindSessionModesResult implements IQueryResult {
-  constructor(
-    readonly sessionModes: Readonly<{
-      id: string;
-      title: string;
-      description: string;
-      image: Buffer;
-    }>[],
-  ) {}
+interface SessionMode {
+  id: string;
+  title: string;
+  description: string;
+  image: Buffer;
+}
+
+export class FindSessionModesResult extends FindResult<SessionMode> {
+  constructor(readonly sessionModes: Readonly<SessionMode>[]) {
+    super(sessionModes);
+  }
 }

@@ -1,6 +1,5 @@
-import { SessionType } from "../entities/SessionDataStructure";
+import { SessionDataStructure } from '../entities/SessionDataStructure';
+import { BaseSessionComponentRepository } from './base/BaseSessionComponentRepository';
 
-export interface SessionTypeRepository {
-    save: (account: SessionType | SessionType[]) => Promise<void>
-    findById: (id: string) => Promise<SessionType | null>
-  }
+export interface SessionDataStructureRepository
+  extends BaseSessionComponentRepository<SessionDataStructure> {}

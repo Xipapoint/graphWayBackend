@@ -5,17 +5,18 @@ import {
   BaseSessionComponentOptionalProperties,
 } from './base/BaseSessionComponent';
 
-export type SessionTypeEssentialProperties =
+export type SessionDataStructureEssentialProperties =
   BaseSessionComponentEssentialProperties;
 
-export type SessionTypeOptionalProperties =
+export type SessionDataStructureOptionalProperties =
   BaseSessionComponentOptionalProperties;
 
-export type SessionTypeProperties = SessionTypeEssentialProperties &
-  Required<SessionTypeOptionalProperties>;
+export type SessionDataStructureProperties =
+  SessionDataStructureEssentialProperties &
+    Required<SessionDataStructureOptionalProperties>;
 
 export class SessionDataStructure extends BaseSessionComponent {
-  constructor(props: SessionTypeProperties) {
+  constructor(props: SessionDataStructureProperties) {
     super();
     Object.assign(this, props);
   }
