@@ -1,3 +1,4 @@
+import { Inject } from '@nestjs/common';
 import { writeConnection } from 'src/core/sessions/libs/DatabaseModule';
 import {
   SessionMode,
@@ -6,7 +7,6 @@ import {
 import { SessionModeFactory } from '../../domain/factories/SessionModeFactory';
 import { SessionModeRepository } from '../../domain/repositories/SessionModeRepository';
 import { SessionModeEntity } from '../entities/SessionModeEntity';
-import { Inject } from '@nestjs/common';
 
 export class SessionModeRepositoryImpl implements SessionModeRepository {
   @Inject() private readonly sessionModeFactory: SessionModeFactory;
@@ -24,6 +24,12 @@ export class SessionModeRepositoryImpl implements SessionModeRepository {
       .getRepository(SessionModeEntity)
       .findOneBy({ id });
     return entity ? this.entityToModel(entity) : null;
+  }
+
+  async exists(title: string): Promise<boolean> {
+    return await writeConnection.manager
+      .getRepository(SessionModeEntity)
+      .exists({ select: ['title'], where: { title } });
   }
 
   private modelToEntity(model: SessionMode): SessionModeEntity {

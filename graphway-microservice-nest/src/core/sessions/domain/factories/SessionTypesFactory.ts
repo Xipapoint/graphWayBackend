@@ -1,6 +1,6 @@
 import { Inject } from "@nestjs/common";
 import { EventPublisher } from "@nestjs/cqrs";
-import { SessionType, SessionTypeEssentialProperties, SessionTypeProperties } from "../entities/SessionType";
+import { SessionType, SessionTypeEssentialProperties, SessionTypeProperties } from "../entities/SessionDataStructure";
 
   export class SessionTypeFactory {
     @Inject(EventPublisher) private readonly eventPublisher: EventPublisher;

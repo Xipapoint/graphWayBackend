@@ -1,5 +1,4 @@
 import { Logger } from '@nestjs/common';
-import dotenv from 'dotenv';
 import {
   IsBoolean,
   IsString,
@@ -7,8 +6,6 @@ import {
   IsEmail,
   validateSync,
 } from 'class-validator';
-
-dotenv.config();
 
 class Configuration {
   private readonly logger = new Logger(Configuration.name);
@@ -48,4 +45,4 @@ class Configuration {
   }
 }
 
-export const Config = new Configuration();
+export const SessionConfig = new Configuration();

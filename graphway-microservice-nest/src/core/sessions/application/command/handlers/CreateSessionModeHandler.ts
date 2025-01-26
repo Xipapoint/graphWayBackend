@@ -15,6 +15,10 @@ export class CreateSessionModeHandler
   private readonly sessionModeRepository: SessionModeRepository;
   @Transactional()
   async execute(command: CreateSessionModeCommand): Promise<void> {
+    const isExists = await this.sessionModeRepository.exists(command.title);
+
+    if (isExists) throw new Error('Session mode already exists');
+
     const sessionType = this.sessionModeFactory.create({
       id: crypto.randomUUID(), // TODO: Implement module to create entity things
       ...command,

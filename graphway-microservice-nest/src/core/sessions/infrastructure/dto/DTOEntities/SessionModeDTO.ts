@@ -1,12 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { FindSessionModesResult } from '../../application/query/dto/FindSessionModesResult';
 
-class SessionMode {
+export class SessionModeDTO {
   @ApiProperty({
-    example: 1,
+    example: `${crypto.randomUUID()}`,
     description: 'The unique identifier of the session mode',
   })
-  id: number;
+  id: string;
 
   @ApiProperty({
     example: 'Mode Title',
@@ -26,9 +25,4 @@ class SessionMode {
     description: 'The image associated with the session mode',
   })
   image: Buffer;
-}
-
-export class FindSessionModesResponseDTO extends FindSessionModesResult {
-  @ApiProperty({ type: [SessionMode], description: 'List of session modes' })
-  readonly sessionModes: SessionMode[];
 }

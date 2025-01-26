@@ -14,7 +14,7 @@ export type SessionTypeOptionalProperties =
 export type SessionTypeProperties = SessionTypeEssentialProperties &
   Required<SessionTypeOptionalProperties>;
 
-export class SessionType extends BaseSessionComponent {
+export class SessionDataStructure extends BaseSessionComponent {
   constructor(props: SessionTypeProperties) {
     super();
     Object.assign(this, props);

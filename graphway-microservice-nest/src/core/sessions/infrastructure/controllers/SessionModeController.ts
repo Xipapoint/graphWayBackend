@@ -1,7 +1,7 @@
-import { Controller } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { FindSessionModesQuery } from '../../application/query/queries/FindSessionModesQuery';
-import { FindSessionModesResponseDTO } from '../dto/FindSessionModesResponseDTO';
+import { FindSessionModesResponseDTO } from '../dto/response/FindSessionModesResponseDTO';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Get, UseInterceptors } from '@nestjs/common';
 import {
@@ -10,6 +10,8 @@ import {
   ApiInternalServerErrorResponse,
 } from '@nestjs/swagger';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { CreateSessionModeRequestDTO } from '../dto/request/CreateSessionModeRequestDTO';
+import { CreateSessionModeCommand } from '../../application/command/CreateSessionModeCommand';
 
 @ApiTags('session-modes')
 @Controller()
@@ -19,7 +21,7 @@ export class SessionModeController {
     readonly queryBus: QueryBus,
   ) {}
 
-  @Get()
+  @Get('all')
   @UseInterceptors(CacheInterceptor)
   @ApiOperation({ summary: 'Find session modes' })
   @ApiResponse({
@@ -33,5 +35,24 @@ export class SessionModeController {
   async findSessionModes(): Promise<FindSessionModesResponseDTO> {
     const query = new FindSessionModesQuery();
     return this.queryBus.execute(query);
+  }
+
+  @Post('create')
+  @ApiOperation({ summary: 'Create a session mode' })
+  @ApiResponse({
+    status: 201,
+    description: 'The session mode has been successfully created.',
+  })
+  @ApiBadRequestResponse({ description: 'Bad Request' })
+  @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
+  async createSessionMode(
+    @Body() body: CreateSessionModeRequestDTO,
+  ): Promise<void> {
+    const command = new CreateSessionModeCommand(
+      body.title,
+      body.description,
+      body.image,
+    );
+    await this.commandBus.execute(command);
   }
 }

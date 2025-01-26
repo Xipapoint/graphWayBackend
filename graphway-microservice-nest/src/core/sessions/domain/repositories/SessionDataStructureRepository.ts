@@ -1,4 +1,4 @@
-import { SessionType } from "../entities/SessionType";
+import { SessionType } from "../entities/SessionDataStructure";
 
 export interface SessionTypeRepository {
     save: (account: SessionType | SessionType[]) => Promise<void>

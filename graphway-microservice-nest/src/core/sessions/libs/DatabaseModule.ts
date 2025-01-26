@@ -9,8 +9,8 @@ import {
   SelectQueryBuilder,
 } from 'typeorm';
 
-import { Config } from '../../../Config';
-import { SessionType } from '../domain/entities/SessionType';
+import { SessionConfig } from '../Config';
+import { SessionModeEntity } from '../infrastructure/entities/SessionModeEntity';
 
 interface WriteConnection {
   readonly startTransaction: (
@@ -44,14 +44,14 @@ export let readConnection = {} as ReadConnection;
 class DatabaseService implements OnModuleInit, OnModuleDestroy {
   private readonly dataSource = new DataSource({
     type: 'postgres',
-    entities: [SessionType],
-    logging: Config.DATABASE_LOGGING,
-    host: Config.DATABASE_HOST,
-    port: Config.DATABASE_PORT,
-    database: Config.DATABASE_NAME,
-    username: Config.DATABASE_USER,
-    password: Config.DATABASE_PASSWORD,
-    synchronize: Config.DATABASE_SYNC,
+    entities: [SessionModeEntity],
+    logging: SessionConfig.DATABASE_LOGGING,
+    host: SessionConfig.DATABASE_HOST,
+    port: SessionConfig.DATABASE_PORT,
+    database: SessionConfig.DATABASE_NAME,
+    username: SessionConfig.DATABASE_USER,
+    password: SessionConfig.DATABASE_PASSWORD,
+    synchronize: SessionConfig.DATABASE_SYNC,
   });
 
   async onModuleInit(): Promise<void> {

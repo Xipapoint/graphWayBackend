@@ -12,10 +12,10 @@ import { BaseTypeormEntity } from './BaseTypeormEntity';
 export class SessionModeEntity extends BaseTypeormEntity {
   @ApiProperty({
     type: String,
-    format: 'binary',
+    format: 'uuid',
     example: '123e4567-e89b-12d3-a456-426614174000',
   })
-  @PrimaryColumn({ type: 'binary' })
+  @PrimaryColumn({ type: 'uuid' })
   id: string;
 
   @ApiProperty({ example: 'Session Title' })
@@ -31,7 +31,7 @@ export class SessionModeEntity extends BaseTypeormEntity {
     format: 'binary',
     example: 'image data in binary format',
   })
-  @Column({ type: 'blob' })
+  @Column({ type: 'bytea' })
   image: Buffer;
 
   @ApiProperty({ type: Date, example: '2023-01-01T00:00:00.000Z' })

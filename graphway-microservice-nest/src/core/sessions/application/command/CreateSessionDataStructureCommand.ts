@@ -1,7 +1,7 @@
 import { ICommand } from '@nestjs/cqrs';
 import { ImageBlobType } from '../../domain/types/ImageType';
 
-export class CreateSessionModeCommand implements ICommand {
+export class CreateSessionDataStructureCommand implements ICommand {
   constructor(
     readonly title: string,
     readonly description: string,
