@@ -1,54 +1,55 @@
-import { BaseEntity } from "./BaseEntity";
-import { ImageBlob } from "../../types/ImageType";
+import { BaseEntity } from '../../../../session-components/domain/entities/base/BaseEntity';
+import { ImageBlob } from '../../../../session-components/domain/types/ImageType';
 
 export type BaseSessionEssentialProperties = Readonly<
-  Required<{
-    id: string
-    title: string
-    sessionTypeId: number
-    sessionModeId: number
-    userId: string
-  } & ImageBlob>
->
+  Required<
+    {
+      id: string;
+      title: string;
+      sessionTypeId: number;
+      sessionModeId: number;
+      userId: string;
+    } & ImageBlob
+  >
+>;
 
 export type BaseSessionOptionalProperties = Readonly<
   Partial<{
-    createdAt: Date
-    updatedAt: Date
+    createdAt: Date;
+    updatedAt: Date;
   }>
->
+>;
 
-export type SessionProperties = BaseSessionEssentialProperties & Required<BaseSessionOptionalProperties>
+export type SessionProperties = BaseSessionEssentialProperties &
+  Required<BaseSessionOptionalProperties>;
 
 export class BaseSession extends BaseEntity {
-    private readonly id: string;
-    private title: string;
-    private imagePath: string;
-    private readonly sessionTypeId: number;
+  private readonly id: string;
+  private title: string;
+  private imagePath: string;
+  private readonly sessionTypeId: number;
 
-    getId(): string {
-        return this.id;
-    }
+  getId(): string {
+    return this.id;
+  }
 
-    getTitle(): string {
-        return this.title;
-    }
+  getTitle(): string {
+    return this.title;
+  }
 
-    getImagePath(): string {
-        return this.imagePath;
-    }
+  getImagePath(): string {
+    return this.imagePath;
+  }
 
-    getSessionTypeId(): number {
-        return this.sessionTypeId;
-    }
+  getSessionTypeId(): number {
+    return this.sessionTypeId;
+  }
 
+  setTitle(title: string): void {
+    this.title = title;
+  }
 
-    setTitle(title: string): void {
-        this.title = title;
-    }
-
-    setImagePath(imagePath: string): void {
-        this.imagePath = imagePath;
-    }
-
+  setImagePath(imagePath: string): void {
+    this.imagePath = imagePath;
+  }
 }

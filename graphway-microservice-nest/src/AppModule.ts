@@ -1,8 +1,8 @@
 import { CacheModule } from '@nestjs/cache-manager';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './AppController';
-import { SessionModule } from './core/sessions/SessionsModule';
-import { RequestStorageMiddleware } from './core/sessions/libs/RequestStorageModuleMiddleware';
+import { SessionModule } from './core/session-components/SessionsModule';
+import { RequestStorageMiddleware } from './core/session-components/libs/RequestStorageModuleMiddleware';
 
 @Module({
   imports: [SessionModule, CacheModule.register({ isGlobal: true })],
