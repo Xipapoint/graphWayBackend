@@ -6,9 +6,11 @@ export type BaseSessionEssentialProperties = Readonly<
     {
       id: string;
       title: string;
-      sessionTypeId: number;
-      sessionModeId: number;
+      sessionDataStructureId: string;
+      sessionModeId: string;
+      sessionStructureId: string;
       userId: string;
+      analyticsId: string;
     } & ImageBlob
   >
 >;
@@ -24,10 +26,14 @@ export type SessionProperties = BaseSessionEssentialProperties &
   Required<BaseSessionOptionalProperties>;
 
 export class BaseSession extends BaseEntity {
-  private readonly id: string;
-  private title: string;
-  private imagePath: string;
-  private readonly sessionTypeId: number;
+  protected readonly id: string;
+  protected title: string;
+  protected image: Buffer;
+  protected readonly userId: string;
+  protected readonly sessionDataStructureId: string;
+  protected readonly sessionModeId: string;
+  protected readonly sessionStructureId: string;
+  protected analyticsId: string;
 
   getId(): string {
     return this.id;
@@ -37,19 +43,39 @@ export class BaseSession extends BaseEntity {
     return this.title;
   }
 
-  getImagePath(): string {
-    return this.imagePath;
+  getImagePath(): Buffer {
+    return this.image;
   }
 
-  getSessionTypeId(): number {
-    return this.sessionTypeId;
+  getSessionDataStructureId(): string {
+    return this.sessionDataStructureId;
+  }
+
+  getSessionStructureId(): string {
+    return this.sessionStructureId;
+  }
+
+  getUserId(): string {
+    return this.userId;
+  }
+
+  getSessionModeId(): string {
+    return this.sessionModeId;
+  }
+
+  getAnalyticsId(): string {
+    return this.analyticsId;
   }
 
   setTitle(title: string): void {
     this.title = title;
   }
 
-  setImagePath(imagePath: string): void {
-    this.imagePath = imagePath;
+  setImagePath(imagePath: Buffer): void {
+    this.image = imagePath;
+  }
+
+  setAnalyticsId(analyticsId: string): void {
+    this.analyticsId = analyticsId;
   }
 }

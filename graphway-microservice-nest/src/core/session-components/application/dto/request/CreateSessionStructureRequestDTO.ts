@@ -4,7 +4,7 @@ import { IsString, MinLength } from 'class-validator';
 export class CreateSessionStructureRequestDTO {
   @IsString()
   @MinLength(2)
-  @ApiProperty({ minLength: 2, maxLength: 8, example: 'Directed graph' })
+  @ApiProperty({ minLength: 2, example: 'Directed graph' })
   readonly title: string;
 
   @IsString()

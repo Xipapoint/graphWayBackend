@@ -4,7 +4,7 @@ import { IsString, MinLength } from 'class-validator';
 export class CreateSessionModeRequestDTO {
   @IsString()
   @MinLength(2)
-  @ApiProperty({ minLength: 2, maxLength: 8, example: 'Console' })
+  @ApiProperty({ minLength: 2, example: 'Console' })
   readonly title: string;
 
   @IsString()

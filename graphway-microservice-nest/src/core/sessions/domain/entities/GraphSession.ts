@@ -1,3 +1,5 @@
+import { GraphSessionCreatedEvent } from '../event/GraphSessionCreatedEvent';
+import { GraphSessionUpdatedEvent } from '../event/GraphSessionUpdatedEvent';
 import {
   BaseSession,
   BaseSessionEssentialProperties,
@@ -7,16 +9,15 @@ import {
 export type GraphSessionEssentialProperties = BaseSessionEssentialProperties &
   Readonly<
     Required<{
-      sessionAlgorithmId: number;
-      sessionStructureId: number;
+      sessionAlgorithmId: string;
     }>
   >;
 
 export type GraphSessionOptionalProperties = BaseSessionOptionalProperties &
   Readonly<
     Partial<{
-      verticesId: number[];
-      edgesId: number[];
+      vertexIds: number[];
+      edgeIds: number[];
     }>
   >;
 
@@ -24,34 +25,34 @@ export type GraphSessionProperties = GraphSessionEssentialProperties &
   Required<GraphSessionOptionalProperties>;
 
 export class GraphSession extends BaseSession {
-  private readonly sessionAlgorithmId: number;
-  private readonly sessionStructureId: number;
-  private verticesId: number[];
-  private edgesId: number[];
+  private readonly sessionAlgorithmId: string;
+  private vertexIds: number[];
+  private edgeIds: number[];
 
   constructor(props: GraphSessionProperties) {
     super();
     Object.assign(this, props);
   }
 
-  update(verticesId: number[], edgesId: number[]): void {
-    this.verticesId = verticesId;
-    this.edgesId = edgesId;
+  updateSession(vertexIds: number[], edgeIds: number[]): void {
+    this.vertexIds = vertexIds;
+    this.edgeIds = edgeIds;
+    this.apply(new GraphSessionUpdatedEvent(vertexIds, edgeIds));
   }
 
-  getSessionAlgorithmId(): number {
+  createdGraphSession(): void {
+    this.apply(new GraphSessionCreatedEvent(this.id));
+  }
+
+  getSessionAlgorithmId(): string {
     return this.sessionAlgorithmId;
   }
 
-  getSessionStructureId(): number {
-    return this.sessionStructureId;
+  getvertexIds(): number[] {
+    return this.vertexIds;
   }
 
-  getVerticesId(): number[] {
-    return this.verticesId;
-  }
-
-  getEdgesId(): number[] {
-    return this.edgesId;
+  getedgeIds(): number[] {
+    return this.edgeIds;
   }
 }

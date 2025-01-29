@@ -103,4 +103,4 @@ const domain = [
   ],
   providers: [...infrastructure, ...application, ...domain],
 })
-export class SessionModule {}
+export class SessionComponentModule {}

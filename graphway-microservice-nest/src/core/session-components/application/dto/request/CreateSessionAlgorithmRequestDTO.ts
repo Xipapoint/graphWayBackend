@@ -4,7 +4,7 @@ import { IsString, MinLength } from 'class-validator';
 export class CreateSessionAlgorithmRequestDTO {
   @IsString()
   @MinLength(2)
-  @ApiProperty({ minLength: 2, maxLength: 8, example: 'Dikstra algorithm' })
+  @ApiProperty({ minLength: 2, example: 'Dikstra algorithm' })
   readonly title: string;
 
   @IsString()
