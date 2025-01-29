@@ -9,7 +9,7 @@ export type SessionAlgorithmEssentialProperties =
   BaseSessionComponentEssentialProperties &
     Readonly<
       Required<{
-        sessionStructureId: string;
+        sessionStructureIds: string[];
       }>
     >;
 
@@ -20,7 +20,7 @@ export type SessionAlgorithmProperties = SessionAlgorithmEssentialProperties &
   Required<SessionAlgorithmOptionalProperties>;
 
 export class SessionAlgorithm extends BaseSessionComponent {
-  private sessionStructureId: string;
+  protected sessionStructureIds: string[];
 
   constructor(props: SessionAlgorithmProperties) {
     super();
@@ -31,7 +31,7 @@ export class SessionAlgorithm extends BaseSessionComponent {
     this.apply(new CreatedSessionComponent(this.id, this.title));
   }
 
-  getSessionStructureId(): string {
-    return this.sessionStructureId;
+  getSessionStructureId(): string[] {
+    return this.sessionStructureIds;
   }
 }

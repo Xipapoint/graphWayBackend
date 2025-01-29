@@ -31,6 +31,13 @@ export class SessionDataStructureRepositoryImpl
     return entity ? this.entityToModel(entity) : null;
   }
 
+  async findAll(): Promise<SessionDataStructure[]> {
+    const entities = await writeConnection.manager
+      .getRepository(SessionDataStructureEntity)
+      .find();
+    return entities.map((entity) => this.entityToModel(entity));
+  }
+
   async exists(title: string): Promise<boolean> {
     return await writeConnection.manager
       .getRepository(SessionDataStructureEntity)

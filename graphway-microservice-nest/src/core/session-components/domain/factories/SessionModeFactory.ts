@@ -1,6 +1,10 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { EventPublisher } from "@nestjs/cqrs";
-import { SessionMode, SessionModeEssentialProperties, SessionModeProperties } from "../entities/SessionMode";
+import { Inject, Injectable } from '@nestjs/common';
+import { EventPublisher } from '@nestjs/cqrs';
+import {
+  SessionMode,
+  SessionModeEssentialProperties,
+  SessionModeProperties,
+} from '../entities/SessionMode';
 
 @Injectable()
 export class SessionModeFactory {
@@ -17,8 +21,6 @@ export class SessionModeFactory {
   }
 
   reconstitute(properties: SessionModeProperties): SessionMode {
-    return this.eventPublisher.mergeObjectContext(
-      new SessionMode(properties),
-    );
+    return this.eventPublisher.mergeObjectContext(new SessionMode(properties));
   }
 }

@@ -11,6 +11,9 @@ import {
 
 import { SessionConfig } from '../Config';
 import { SessionModeEntity } from '../infrastructure/entities/SessionModeEntity';
+import { SessionStructureEntity } from '../infrastructure/entities/SessionStructureEntity';
+import { SessionDataStructureEntity } from '../infrastructure/entities/SessionDataStructureEntity';
+import { SessionAlgorithmEntity } from '../infrastructure/entities/SessionAlgorithmEntity';
 
 interface WriteConnection {
   readonly startTransaction: (
@@ -44,7 +47,12 @@ export let readConnection = {} as ReadConnection;
 class DatabaseService implements OnModuleInit, OnModuleDestroy {
   private readonly dataSource = new DataSource({
     type: 'postgres',
-    entities: [SessionModeEntity],
+    entities: [
+      SessionModeEntity,
+      SessionStructureEntity,
+      SessionDataStructureEntity,
+      SessionAlgorithmEntity,
+    ],
     logging: SessionConfig.DATABASE_LOGGING,
     host: SessionConfig.DATABASE_HOST,
     port: SessionConfig.DATABASE_PORT,

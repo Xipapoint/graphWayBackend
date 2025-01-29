@@ -1,6 +1,9 @@
 import { SessionAlgorithm } from '../entities/SessionAlgorithm';
+import { BaseSessionComponentRepository } from './base/BaseSessionComponentRepository';
 
-export interface SessionAlgorithmRepository {
-  save: (account: SessionAlgorithm | SessionAlgorithm[]) => Promise<void>;
-  findById: (id: string) => Promise<SessionAlgorithm | null>;
+export interface SessionAlgorithmRepository
+  extends BaseSessionComponentRepository<SessionAlgorithm> {
+  findAlgorithmsByStructureId: (
+    structureId: string,
+  ) => Promise<SessionAlgorithm[]>;
 }

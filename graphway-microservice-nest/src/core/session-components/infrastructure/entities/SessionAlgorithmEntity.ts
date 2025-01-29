@@ -1,12 +1,13 @@
-import { Entity, ManyToMany } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 import { BaseSessionComponentEntity } from './base/BaseSessionComponentEntity';
-import { SessionStructureEntity } from './SessionStructureEntity';
+import { ApiProperty } from '@nestjs/swagger';
 
-@Entity({ name: 'session-data-algorithms' })
+@Entity({ name: 'session-algorithms' })
 export class SessionAlgorithmEntity extends BaseSessionComponentEntity {
-  @ManyToMany(
-    () => SessionStructureEntity,
-    (sessionStructure) => sessionStructure.algorithms,
-  )
-  sessionStructures: SessionStructureEntity[];
+  @ApiProperty({
+    type: [String],
+    description: 'Array of session structure IDs',
+  })
+  @Column('simple-array')
+  sessionStructureIds: string[];
 }

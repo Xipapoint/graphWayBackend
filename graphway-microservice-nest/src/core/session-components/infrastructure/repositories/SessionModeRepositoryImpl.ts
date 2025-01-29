@@ -26,6 +26,13 @@ export class SessionModeRepositoryImpl implements SessionModeRepository {
     return entity ? this.entityToModel(entity) : null;
   }
 
+  async findAll(): Promise<SessionMode[]> {
+    const entities = await writeConnection.manager
+      .getRepository(SessionModeEntity)
+      .find();
+    return entities.map((entity) => this.entityToModel(entity));
+  }
+
   async exists(title: string): Promise<boolean> {
     return await writeConnection.manager
       .getRepository(SessionModeEntity)

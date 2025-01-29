@@ -1,6 +1,12 @@
 import { CacheInterceptor } from '@nestjs/cache-manager';
-import { Body, Controller, Get, Post, UseInterceptors } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Post,
+  UseInterceptors,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiInternalServerErrorResponse,
@@ -9,51 +15,53 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateSessionDataStructureCommand } from '../../application/command/CreateSessionDataStructureCommand';
-import { FindSessionDataStructuresQuery } from '../../application/query/queries/FindSessionDataStructuresQuery';
-import { CreateSessionDataStructureRequestDTO } from '../dto/request/CreateSessionDataStructureRequestDTO';
-import { FindSessionDataStructuresResponseDTO } from '../dto/response/FindSessionDataStructuresResponseDTO';
+import { CreateSessionDataStructureRequestDTO } from '../../application/dto/request/CreateSessionDataStructureRequestDTO';
+import { FindSessionDataStructuresResponseDTO } from '../../application/dto/response/FindSessionDataStructuresResponseDTO';
+import { InjectionToken } from '../../application/InjectToken';
+import { SessionDataStructureService } from '../../application/services/SessionDataStructureService';
 
 @ApiTags('session-data-structures')
 @Controller('session-data-structures')
 export class SessionDataStructureController {
-  constructor(
-    readonly commandBus: CommandBus,
-    readonly queryBus: QueryBus,
-  ) {}
+  @Inject(InjectionToken.SESSION_DATA_STRUCTURE_SERVICE)
+  private readonly sessionDataStructureService: SessionDataStructureService;
 
   @Get('all')
   @UseInterceptors(CacheInterceptor)
-  @ApiOperation({ summary: 'Find session data structures' })
+  @ApiOperation({ summary: 'Find session DataStructures' })
   @ApiResponse({
     status: 200,
-    description: 'The found session data structures',
+    description: 'The found session DataStructures',
     type: FindSessionDataStructuresResponseDTO,
   })
   @ApiBadRequestResponse({ description: 'Bad Request' })
   @ApiNotFoundResponse({ description: 'Not Found' })
   @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
   async findSessionDataStructures(): Promise<FindSessionDataStructuresResponseDTO> {
-    const query = new FindSessionDataStructuresQuery();
-    return this.queryBus.execute(query);
+    try {
+      const sessionDataStructures =
+        await this.sessionDataStructureService.findAll();
+      return { sessionDataStructures };
+    } catch (error) {
+      throw new Error(String(error));
+    }
   }
 
   @Post('create')
-  @ApiOperation({ summary: 'Create a session data structure' })
+  @ApiOperation({ summary: 'Create a session DataStructure' })
   @ApiResponse({
     status: 201,
-    description: 'The session data structure has been successfully created.',
+    description: 'The session DataStructure has been successfully created.',
   })
   @ApiBadRequestResponse({ description: 'Bad Request' })
   @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
   async createSessionDataStructure(
     @Body() body: CreateSessionDataStructureRequestDTO,
   ): Promise<void> {
-    const command = new CreateSessionDataStructureCommand(
-      body.title,
-      body.description,
-      body.image,
-    );
-    await this.commandBus.execute(command);
+    try {
+      return await this.sessionDataStructureService.create(body);
+    } catch (error) {
+      throw new Error(String(error));
+    }
   }
 }

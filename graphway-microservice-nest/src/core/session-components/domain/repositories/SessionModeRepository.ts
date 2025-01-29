@@ -1,7 +1,5 @@
 import { SessionMode } from '../entities/SessionMode';
+import { BaseSessionComponentRepository } from './base/BaseSessionComponentRepository';
 
-export interface SessionModeRepository {
-  save: (account: SessionMode | SessionMode[]) => Promise<void>;
-  findById: (id: string) => Promise<SessionMode | null>;
-  exists: (title: string) => Promise<boolean>;
-}
+export interface SessionModeRepository
+  extends BaseSessionComponentRepository<SessionMode> {}

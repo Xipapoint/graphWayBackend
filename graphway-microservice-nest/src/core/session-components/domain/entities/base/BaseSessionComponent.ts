@@ -23,16 +23,16 @@ export type BaseSessionComponentProperties =
     Required<BaseSessionComponentOptionalProperties>;
 
 export class BaseSessionComponent extends BaseEntity {
-  protected readonly id: number;
+  protected readonly id: string;
   protected readonly title: string;
   protected description: string;
   protected image: ImageBlobType;
 
-  getId(): number {
+  getId(): string {
     return this.id;
   }
 
-  getName(): string {
+  getTitle(): string {
     return this.title;
   }
 

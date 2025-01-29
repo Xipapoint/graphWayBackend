@@ -1,27 +1,32 @@
 import { CacheInterceptor } from '@nestjs/cache-manager';
-import { Controller, Get, UseInterceptors, Post, Body } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
-  ApiTags,
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Post,
+  UseInterceptors,
+} from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
   ApiOperation,
   ApiResponse,
-  ApiBadRequestResponse,
-  ApiNotFoundResponse,
-  ApiInternalServerErrorResponse,
+  ApiTags,
 } from '@nestjs/swagger';
-import { CreateSessionAlgorithmCommand } from '../../application/command/CreateSessionAlgorithmCommand';
-import { FindSessionModesQuery } from '../../application/query/queries/FindSessionModesQuery';
-import { CreateSessionAlgorithmRequestDTO } from '../dto/request/CreateSessionAlgorithmRequestDTO';
-import { FindSessionAlgorithmsResponseDTO } from '../dto/response/FindSessionAlgorithmsDTO';
-import { FindSessionModesResponseDTO } from '../dto/response/FindSessionModesResponseDTO';
+import { SessionAlgorithmDTO } from '../../application/dto/DTOEntities/SessionAlgorithmDTO';
+import { CreateSessionAlgorithmRequestDTO } from '../../application/dto/request/CreateSessionAlgorithmRequestDTO';
+import { FindSessionAlgorithmsResponseDTO } from '../../application/dto/response/FindSessionAlgorithmsDTO';
+import { InjectionToken } from '../../application/InjectToken';
+import { SessionAlgorithmService } from '../../application/services/SessionAlgorithmService';
 
 @ApiTags('session-algorithms')
 @Controller('session-algorithms')
-export class SessionModeController {
-  constructor(
-    readonly commandBus: CommandBus,
-    readonly queryBus: QueryBus,
-  ) {}
+export class SessionAlgorithmController {
+  @Inject(InjectionToken.SESSION_ALGORITHM_SERVICE)
+  private readonly sessionAlgorithmService: SessionAlgorithmService;
 
   @Get('all')
   @UseInterceptors(CacheInterceptor)
@@ -29,14 +34,18 @@ export class SessionModeController {
   @ApiResponse({
     status: 200,
     description: 'The found session algorithms',
-    type: FindSessionModesResponseDTO,
+    type: FindSessionAlgorithmsResponseDTO,
   })
   @ApiBadRequestResponse({ description: 'Bad Request' })
   @ApiNotFoundResponse({ description: 'Not Found' })
   @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
   async findSessionAlgorithms(): Promise<FindSessionAlgorithmsResponseDTO> {
-    const query = new FindSessionModesQuery();
-    return this.queryBus.execute(query);
+    try {
+      const sessionAlgorithms = await this.sessionAlgorithmService.findAll();
+      return { sessionAlgorithms };
+    } catch (error) {
+      throw new Error(String(error));
+    }
   }
 
   @Post('create')
@@ -50,12 +59,34 @@ export class SessionModeController {
   async createSessionAlgorithm(
     @Body() body: CreateSessionAlgorithmRequestDTO,
   ): Promise<void> {
-    const command = new CreateSessionAlgorithmCommand(
-      body.title,
-      body.description,
-      body.image,
-      body.sessionStructureId,
-    );
-    await this.commandBus.execute(command);
+    try {
+      return await this.sessionAlgorithmService.create(body);
+    } catch (error) {
+      throw new Error(String(error));
+    }
+  }
+
+  @Get('by-structure/:structureId')
+  @ApiOperation({ summary: 'Find session algorithms by structure ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'The found session algorithms by structure ID',
+    type: [SessionAlgorithmDTO],
+  })
+  @ApiBadRequestResponse({ description: 'Bad Request' })
+  @ApiNotFoundResponse({ description: 'Not Found' })
+  @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
+  async findSessionAlgorithmsByStructureId(
+    @Param('structureId') structureId: string,
+  ): Promise<SessionAlgorithmDTO[]> {
+    try {
+      const sessionAlgorithms =
+        await this.sessionAlgorithmService.findSessionAlgorithmsByStructureId(
+          structureId,
+        );
+      return sessionAlgorithms;
+    } catch (error) {
+      throw new Error(String(error));
+    }
   }
 }

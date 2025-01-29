@@ -1,25 +1,25 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { FindSessionModesQuery } from '../../application/query/queries/FindSessionModesQuery';
-import { FindSessionModesResponseDTO } from '../dto/response/FindSessionModesResponseDTO';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Body, Controller, Inject, Post } from '@nestjs/common';
+
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import { Get, UseInterceptors } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
-  ApiNotFoundResponse,
   ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
-import { CacheInterceptor } from '@nestjs/cache-manager';
-import { CreateSessionModeRequestDTO } from '../dto/request/CreateSessionModeRequestDTO';
-import { CreateSessionModeCommand } from '../../application/command/CreateSessionModeCommand';
+import { InjectionToken } from '../../application/InjectToken';
+import { CreateSessionModeRequestDTO } from '../../application/dto/request/CreateSessionModeRequestDTO';
+import { FindSessionModesResponseDTO } from '../../application/dto/response/FindSessionModesResponseDTO';
+import { SessionModeService } from '../../application/services/SessionModeService';
 
 @ApiTags('session-modes')
 @Controller('session-modes')
 export class SessionModeController {
-  constructor(
-    readonly commandBus: CommandBus,
-    readonly queryBus: QueryBus,
-  ) {}
+  @Inject(InjectionToken.SESSION_MODE_SERVICE)
+  private readonly sessionModeService: SessionModeService;
 
   @Get('all')
   @UseInterceptors(CacheInterceptor)
@@ -33,8 +33,12 @@ export class SessionModeController {
   @ApiNotFoundResponse({ description: 'Not Found' })
   @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
   async findSessionModes(): Promise<FindSessionModesResponseDTO> {
-    const query = new FindSessionModesQuery();
-    return this.queryBus.execute(query);
+    try {
+      const sessionModes = await this.sessionModeService.findAll();
+      return { sessionModes };
+    } catch (error) {
+      throw new Error(String(error));
+    }
   }
 
   @Post('create')
@@ -48,11 +52,10 @@ export class SessionModeController {
   async createSessionMode(
     @Body() body: CreateSessionModeRequestDTO,
   ): Promise<void> {
-    const command = new CreateSessionModeCommand(
-      body.title,
-      body.description,
-      body.image,
-    );
-    await this.commandBus.execute(command);
+    try {
+      return await this.sessionModeService.create(body);
+    } catch (error) {
+      throw new Error(String(error));
+    }
   }
 }
