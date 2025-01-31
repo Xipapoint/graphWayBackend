@@ -8,6 +8,7 @@ export class SessionStructureMapper {
       title: sessionStructure.getTitle(),
       description: sessionStructure.getDescription(),
       image: sessionStructure.getImagePath(),
+      sessionDataStructureIds: sessionStructure.getSessionDataStructureIds(),
     };
   }
 

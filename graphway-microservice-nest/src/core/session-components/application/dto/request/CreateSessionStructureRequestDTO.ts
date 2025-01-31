@@ -19,4 +19,8 @@ export class CreateSessionStructureRequestDTO {
     description: 'Image file for the session structure',
   })
   readonly image: Buffer;
+
+  @IsString()
+  @ApiProperty({ example: [`${crypto.randomUUID()}`] })
+  readonly sessionDataStructureIds: string[];
 }

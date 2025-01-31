@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   Inject,
+  Param,
   Post,
   UseInterceptors,
 } from '@nestjs/common';
@@ -19,6 +20,7 @@ import { CreateSessionStructureRequestDTO } from '../../application/dto/request/
 import { FindSessionStructuresResponseDTO } from '../../application/dto/response/FindSessionStructuresDTO';
 import { InjectionToken } from '../../application/InjectToken';
 import { SessionStructureService } from '../../application/services/SessionStructureService';
+import { SessionStructureDTO } from '../../application/dto/DTOEntities/SessionStructureDTO';
 
 @ApiTags('session-structures')
 @Controller('session-structures')
@@ -59,6 +61,30 @@ export class SessionStructureController {
   ): Promise<void> {
     try {
       return await this.sessionStructureService.create(body);
+    } catch (error) {
+      throw new Error(String(error));
+    }
+  }
+
+  @Get('by-data-structure/:dataStructureId')
+  @ApiOperation({ summary: 'Find session structures by data structure ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'The found session structures by data structure ID',
+    type: [SessionStructureDTO],
+  })
+  @ApiBadRequestResponse({ description: 'Bad Request' })
+  @ApiNotFoundResponse({ description: 'Not Found' })
+  @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
+  async findSessionAlgorithmsByStructureId(
+    @Param('dataStructureId') dataStructureId: string,
+  ): Promise<SessionStructureDTO[]> {
+    try {
+      const sessionStructures =
+        await this.sessionStructureService.findSessionStructuresByDataStructureId(
+          dataStructureId,
+        );
+      return sessionStructures;
     } catch (error) {
       throw new Error(String(error));
     }

@@ -47,7 +47,6 @@ export class SessionAlgorithmRepositoryImpl
     const algorithmEntities = await writeConnection.manager
       .getRepository(SessionAlgorithmEntity)
       .find({
-        select: ['sessionStructureIds'],
         where: { sessionStructureIds: structureId },
       });
 

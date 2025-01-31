@@ -35,6 +35,18 @@ export class SessionStructureRepositoryImpl
     return entities.map((entity) => this.entityToModel(entity));
   }
 
+  async findStructuresByDataStructureId(
+    dataStructureId: string,
+  ): Promise<SessionStructure[]> {
+    const algorithmEntities = await writeConnection.manager
+      .getRepository(SessionStructureEntity)
+      .find({
+        where: { sessionDataStructureIds: dataStructureId },
+      });
+
+    return algorithmEntities.map((entity) => this.entityToModel(entity));
+  }
+
   async exists(title: string): Promise<boolean> {
     return await writeConnection.manager
       .getRepository(SessionStructureEntity)

@@ -25,4 +25,11 @@ export class SessionStructureDTO {
     description: 'The image associated with the session structure',
   })
   image: Buffer;
+
+  @ApiProperty({
+    example: `${crypto.randomUUID()}`,
+    description:
+      'The unique identifiers of the session Data Structures that are associated with the session Structure',
+  })
+  sessionDataStructureIds: string[];
 }

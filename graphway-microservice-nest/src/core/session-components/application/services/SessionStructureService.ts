@@ -24,6 +24,16 @@ export class SessionStructureService {
     return this.sessionStructureMapper.toDTOs(sessionStructures);
   }
 
+  async findSessionStructuresByDataStructureId(
+    dataStructureId: string,
+  ): Promise<SessionStructureDTO[]> {
+    const sessionStructures =
+      await this.sessionStructureRepository.findStructuresByDataStructureId(
+        dataStructureId,
+      );
+    return this.sessionStructureMapper.toDTOs(sessionStructures);
+  }
+
   async create(props: CreateSessionStructureRequestDTO): Promise<void> {
     const isExists = await this.sessionStructureRepository.exists(props.title);
     if (isExists) throw new AlreadyExistsException('Algorithm');
